@@ -1,0 +1,23 @@
+server:
+  port: 8000
+spring:
+  plugin:
+    name: spring-plugin
+    config:
+      enable: true
+      prefix: plugin-
+      file-extension: yml
+    intercept:
+      white-list:
+        - /pm/**
+        - /v3/api-docs/**
+        - /swagger-ui.html
+        - /swagger-ui/**
+        - /webjars/**
+        - /favicon.ico
+        - /error
+#      identity-mode: HEADER
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB

@@ -1,0 +1,9 @@
+org.springframework.boot.autoconfigure.data
+org.springframework.boot.autoconfigure.dao
+org.springframework.boot.autoconfigure.jdbc
+org.springframework.boot.autoconfigure.transaction
+org.springframework.boot.autoconfigure.sql
+org.springframework.boot.autoconfigure.flyway
+org.springframework.boot.jdbc
+jakarta.servlet.Servlet
+org.springframework.web.context.ConfigurableWebApplicationContext

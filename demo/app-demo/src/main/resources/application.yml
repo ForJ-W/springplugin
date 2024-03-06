@@ -1,0 +1,86 @@
+# datasource配置
+server:
+  common-ip: localhost
+  port: 8104
+  mysql:
+    database: plugin_demo
+    ip: ${server.common-ip}
+    port: 3306
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    ip: ${server.common-ip}
+    port: 6379
+    password: root
+
+
+spring:
+  application:
+    name: app-demo
+  # sql初始化配置
+  sql:
+    init:
+      schemaLocations: db/db.init.sql
+      username: ${server.mysql.username}
+      password: ${server.mysql.password}
+      mode: always
+      encoding: utf-8
+  # flyway管理配置
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    clean-disabled: true
+    locations:
+      - classpath:db/migration/
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        allow: ""
+        reset-enable: true
+    dynamic:
+      lazy: true
+      primary: ${server.mysql.database}
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 400
+        maxWait: 300000
+        timeBetweenEvictionRunsMillis: 30000
+        minEvictableIdleTimeMillis: 300000
+        maxEvictableIdleTimeMillis: 3600000
+        timeBetweenLogStatsMillis: 60000
+        statSqlMaxSize: 6000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,slf4j
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      datasource:
+        plugin_demo:
+          driver-class-name: ${server.mysql.driver-class-name}
+          url: jdbc:mysql://${server.mysql.ip}:${server.mysql.port}/${server.mysql.database}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+          username: ${server.mysql.username}
+          password: ${server.mysql.password}
+  data:
+    redis:
+      host: ${server.redis.ip}
+      port: ${server.redis.port}
+      password: ${server.redis.password}
+
+# mybatis配置
+mybatis-plus:
+  # 搜索指定包别名
+  typeAliasesPackage: appdemo.entity
+  #设置当查询结果值为null时，同样映射该查询字段给map
+  configuration:
+    call-setters-on-nulls: true
+
