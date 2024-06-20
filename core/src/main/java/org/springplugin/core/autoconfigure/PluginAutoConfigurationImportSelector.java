@@ -30,6 +30,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.DeferredImportSelector;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
@@ -38,6 +39,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
+import org.springplugin.core.context.SpringPluginFactory;
+import org.springplugin.core.info.PluginInfo;
 
 import java.net.URL;
 import java.util.*;
@@ -90,7 +93,8 @@ public class PluginAutoConfigurationImportSelector implements DeferredImportSele
     @NonNull
     @Override
     public String[] selectImports(@NonNull AnnotationMetadata annotationMetadata) {
-        final String plugin = annotationMetadata.getClassName().split("\\.")[0];
+        final PluginInfo pi = SpringPluginFactory.getPluginInfo((GenericApplicationContext) resourceLoader);
+        final String plugin = pi.name();
         this.beanClassLoader = SpringPluginClassLoader.getInstance(plugin);
         String location = String.format(LOCATION, AutoConfiguration.class.getName());
         Enumeration<URL> urls = ImportCandidates.findUrlsInClasspath(this.beanClassLoader, location);

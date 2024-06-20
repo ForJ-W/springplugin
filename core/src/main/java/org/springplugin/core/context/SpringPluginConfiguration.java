@@ -15,9 +15,7 @@
  *
  */
 
-package org.springplugin.core.factory;
-
-import org.springframework.context.annotation.Bean;
+package org.springplugin.core.context;
 
 /**
  * Spring 插件配置

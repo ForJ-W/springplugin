@@ -17,18 +17,13 @@
 
 package org.springplugin.core.springdoc;
 
-import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springdoc.webmvc.core.providers.SpringWebMvcProvider;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springplugin.core.factory.SpringPluginFactory;
+import org.springplugin.core.context.SpringPluginFactory;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

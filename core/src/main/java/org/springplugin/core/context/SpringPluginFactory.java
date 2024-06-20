@@ -15,7 +15,7 @@
  *
  */
 
-package org.springplugin.core.factory;
+package org.springplugin.core.context;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -28,10 +28,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ReflectionUtils;
-import org.springplugin.core.PluginFuture;
 import org.springplugin.core.exception.SpringPluginException;
+import org.springplugin.core.info.PluginInfo;
+import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.SpringIocUtils;
 
 import java.util.*;
@@ -112,15 +114,16 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     }
 
     /**
-     * 根据上下文获取插件名称
+     * 根据上下文获取插件信息
      *
      * @param context 插件上下文
      * @return 插件名称
      * @author afěi
      */
-    public static String getPluginName(@NonNull GenericApplicationContext context) {
+    public static PluginInfo getPluginInfo(@NonNull GenericApplicationContext context) {
 
-        return context.getEnvironment().getProperty(PROPERTY_NAME);
+        final ConfigurableEnvironment environment = context.getEnvironment();
+        return PluginInfoFactory.get(environment.getProperty(PROPERTY_NAME));
     }
 
     /**
@@ -160,7 +163,17 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
      * @author afěi
      */
     public void initContext(String name) {
-        super.getContext(PluginFuture.get(name));
+        super.getContext(NamedFuture.get(name));
+    }
+
+    /**
+     * 初始化上下文
+     *
+     * @param info 插件信息
+     * @author afěi
+     */
+    public void initContext(PluginInfo info) {
+        super.getContext(info.name());
     }
 
     @Override
@@ -222,7 +235,7 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
 
     @Override
     public GenericApplicationContext buildContext(String name) {
-        name = PluginFuture.get(name);
+        name = NamedFuture.get(name);
         final ConfigurableApplicationContext parent = (ConfigurableApplicationContext) getParent();
         this.applicationContextInitializers.put(name, parent.getBean(SpringPluginChildContextInitializer.class));
         return super.buildContext(name);
@@ -230,7 +243,7 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
 
     @Override
     public GenericApplicationContext getContext(String name) {
-        name = PluginFuture.get(name);
+        name = NamedFuture.get(name);
         if (!this.contexts.containsKey(name)) {
             throw new SpringPluginException(String.format("The current plugin does not exist, %s", name));
         }

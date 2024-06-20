@@ -15,7 +15,7 @@
  *
  */
 
-package org.springplugin.core.factory;
+package org.springplugin.core.context;
 
 import org.springframework.cloud.context.named.NamedContextFactory;
 

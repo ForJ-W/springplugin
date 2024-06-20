@@ -27,13 +27,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springplugin.core.contant.PluginConstant;
-import org.springplugin.core.context.PluginContext;
-import org.springplugin.core.context.SpringPluginContext;
+import org.springplugin.core.context.*;
 import org.springplugin.core.env.properties.SpringPluginProperties;
-import org.springplugin.core.factory.SpringPluginChildContextInitializer;
-import org.springplugin.core.factory.SpringPluginFactory;
-import org.springplugin.core.factory.SpringPluginFactoryCommonSpec;
-import org.springplugin.core.factory.SpringWebPluginConfiguration;
 
 /**
  * 插件配置
@@ -53,7 +48,7 @@ public class SpringPluginConfig {
     @Bean
     public PluginContext pluginContext(SpringPluginFactory springPluginFactory, SpringPluginProperties configProps) {
 
-        return new SpringPluginContext(springPluginFactory, configProps)
+        return new SpringNamedContext(springPluginFactory, configProps)
                 .addFilterAnnotation(SpringBootApplication.class)
                 .addFilterAnnotation(EnableAutoConfiguration.class);
     }

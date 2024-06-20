@@ -37,8 +37,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springplugin.core.context.SpringPluginFactory;
 import org.springplugin.core.env.properties.SpringPluginProperties;
-import org.springplugin.core.factory.SpringPluginFactory;
 import org.springplugin.core.mvc.PluginDispatcherServlet;
 
 import java.util.Arrays;

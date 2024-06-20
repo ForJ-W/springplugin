@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springplugin.core.factory.SpringPluginFactory;
+import org.springplugin.core.context.SpringPluginFactory;
 import org.springplugin.core.env.PluginPropertySourceLocator;
 import org.springplugin.core.env.properties.SpringPluginProperties;
 

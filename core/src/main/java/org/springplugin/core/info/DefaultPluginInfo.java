@@ -21,25 +21,17 @@ import org.springplugin.core.classloader.SpringPluginClassLoader;
 import org.springplugin.core.util.AssertUtils;
 import org.springplugin.core.util.StringUtils;
 
-import java.util.Objects;
-
 /**
  * 默认插件信息
  *
  * @author afěi
  * @version 1.0.0
+ * @param name
+插件名称
+ * @param mainClassName
+主类名称
  */
-public class DefaultPluginInfo implements PluginInfo {
-
-    /**
-     * 插件名称
-     */
-    private final String name;
-
-    /**
-     * 主类名称
-     */
-    private final String mainClassName;
+public record DefaultPluginInfo(String name, String mainClassName) implements PluginInfo {
 
     /**
      * 构造方法
@@ -48,10 +40,8 @@ public class DefaultPluginInfo implements PluginInfo {
      * @param mainClassName 主类名称
      * @author afěi
      */
-    public DefaultPluginInfo(String name, String mainClassName) {
+    public DefaultPluginInfo {
         AssertUtils.isTrue(StringUtils.isNotBlank(name), "The plugin name cannot be empty");
-        this.name = name;
-        this.mainClassName = mainClassName;
     }
 
     /**
@@ -63,7 +53,6 @@ public class DefaultPluginInfo implements PluginInfo {
      * @author afěi
      */
     public static DefaultPluginInfo of(String name, String mainClass) {
-
         return new DefaultPluginInfo(name, mainClass);
     }
 
@@ -75,38 +64,13 @@ public class DefaultPluginInfo implements PluginInfo {
      * @author afěi
      */
     public static DefaultPluginInfo of(String name) {
-
         return new DefaultPluginInfo(name, null);
     }
 
     @Override
-    public String name() {
-
-        return this.name;
-    }
-
-    @Override
     public Class<?> mainClass() throws ClassNotFoundException {
-
         return StringUtils.isNotBlank(this.mainClassName)
                 ? SpringPluginClassLoader.getInstance(name()).forName(this.mainClassName)
                 : PluginInfo.super.mainClass();
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        DefaultPluginInfo that = (DefaultPluginInfo) object;
-        return Objects.equals(name, that.name) && Objects.equals(mainClassName, that.mainClassName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, mainClassName);
     }
 }

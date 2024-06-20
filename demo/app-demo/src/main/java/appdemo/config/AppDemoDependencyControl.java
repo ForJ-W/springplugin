@@ -22,8 +22,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springplugin.core.context.DependencyControl;
 import org.springplugin.core.context.PluginContext;
-import org.springplugin.core.factory.SpringPluginFactory;
-import org.springplugin.core.info.DefaultPluginInfo;
+import org.springplugin.core.context.SpringPluginFactory;
+import org.springplugin.core.info.PluginInfoFactory;
 
 /**
  * @author afěi
@@ -40,7 +40,7 @@ public class AppDemoDependencyControl implements DependencyControl {
     @Override
     public void control() {
         if (!pcf.hasContext("mybatisplusdemo")) {
-            pc.load(DefaultPluginInfo.of("mybatisplusdemo"));
+            pc.load(PluginInfoFactory.get("mybatisplusdemo"));
         }
     }
 

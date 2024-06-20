@@ -18,8 +18,8 @@
 package org.springplugin.core.info;
 
 
-import org.springplugin.core.PluginFuture;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
+import org.springplugin.core.context.NamedFuture;
 
 /**
  * 插件信息
@@ -43,6 +43,13 @@ public interface PluginInfo {
     String name();
 
     /**
+     * 主类名
+     *
+     * @return 主类名
+     */
+    String mainClassName();
+
+    /**
      * 获取主类
      *
      * @return 主类
@@ -51,6 +58,6 @@ public interface PluginInfo {
      */
     default Class<?> mainClass() throws ClassNotFoundException {
 
-        return SpringPluginClassLoader.getInstance(name()).forName(PluginFuture.getRootName(name()) + "." + DEFAULT_MAIN_CLASS_NAME);
+        return SpringPluginClassLoader.getInstance(name()).forName(NamedFuture.getRootName(name()) + "." + DEFAULT_MAIN_CLASS_NAME);
     }
 }

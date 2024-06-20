@@ -21,14 +21,11 @@ package org.springplugin.core.context;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.springplugin.core.PluginFuture;
 import org.springplugin.core.classloader.PluginClassLoader;
-import org.springplugin.core.classloader.PluginClassLoaderFactory;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
 import org.springplugin.core.env.properties.SpringPluginProperties;
-import org.springplugin.core.factory.SpringPluginFactory;
-import org.springplugin.core.info.DefaultPluginInfo;
 import org.springplugin.core.info.PluginInfo;
+import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.ClassUtils;
 
 import java.io.File;
@@ -46,7 +43,7 @@ import java.util.Optional;
  * @version 1.0.0
  */
 @Slf4j
-public class SpringPluginContext extends AbstractPluginContext implements PluginContext, PluginFuture {
+public class SpringNamedContext extends AbstractPluginContext implements PluginContext {
 
     /**
      * spring 插件属性配置类
@@ -65,7 +62,7 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
      * @param pluginProperties    spring 插件属性配置类
      * @author afěi
      */
-    public SpringPluginContext(SpringPluginFactory springPluginFactory, SpringPluginProperties pluginProperties) {
+    public SpringNamedContext(SpringPluginFactory springPluginFactory, SpringPluginProperties pluginProperties) {
         this.springPluginFactory = springPluginFactory;
         this.pluginProperties = pluginProperties;
     }
@@ -81,7 +78,7 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
             // 过滤主类上的注解
             processAnnotationOnClass(mainClass, classLoader);
             // 初始化插件应用上下文
-            springPluginFactory.initContext(name);
+            springPluginFactory.initContext(info);
             log.info("load spring plugin success, {}", name);
         } catch (Throwable e) {
             log.error(String.format("load spring plugin fail, %s", name), e);
@@ -91,9 +88,9 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
     }
 
     @Override
-    public void reset(String name) {
+    protected void reset(String name) {
 
-        unload(DefaultPluginInfo.of(name));
+        unload(PluginInfoFactory.get(name));
     }
 
     @Override

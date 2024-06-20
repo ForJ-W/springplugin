@@ -15,19 +15,17 @@
  *
  */
 
-package org.springplugin.core.factory;
+package org.springplugin.core.context;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.lang.NonNull;
-import org.springplugin.core.PluginFuture;
 import org.springplugin.core.classloader.PluginClassLoader;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
-import org.springplugin.core.context.PluginContextCleaner;
 import org.springplugin.core.env.PluginPropertySourceLocator;
 import org.springplugin.core.exception.SpringPluginException;
-import org.springplugin.core.info.DefaultPluginInfo;
+import org.springplugin.core.info.PluginInfo;
 import org.springplugin.core.util.SpringAwareUtils;
 
 import java.util.Collections;
@@ -54,10 +52,11 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
     @Override
     public void initialize(@NonNull GenericApplicationContext context) {
 
-        final String name = SpringPluginFactory.getPluginName(context);
+        final PluginInfo pi = SpringPluginFactory.getPluginInfo(context);
+        final String name = pi.name();
         contextFactory.setConfigurations(Collections.singletonList(new SpringPluginFactorySpec(name, commonSpec.getConfiguration())));
-        PluginPropertySourceLocator.locateConfigPropertySource(context, PluginFuture.getRootName(name), SpringPluginClassLoader.getInstance(name));
-        registerBean(context, name);
+        PluginPropertySourceLocator.locateConfigPropertySource(context, NamedFuture.getRootName(name), SpringPluginClassLoader.getInstance(name));
+        registerBean(context, pi);
         PluginContextCleaner.register(context, SpringAwareUtils::removeChildAware);
     }
 
@@ -65,11 +64,11 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
      * 注册插件子上下文所需要的bean
      *
      * @param context 通用的应用上下文
-     * @param name    插件名称
+     * @param info    插件xx
      * @author afěi
      */
-    private void registerBean(GenericApplicationContext context, String name) {
-        final DefaultPluginInfo info = DefaultPluginInfo.of(name);
+    private void registerBean(GenericApplicationContext context, PluginInfo info) {
+        final String name = info.name();
         final Class<?> mainClass;
         try {
             mainClass = info.mainClass();

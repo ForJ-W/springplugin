@@ -36,8 +36,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springplugin.core.contant.PluginConstant;
+import org.springplugin.core.context.SpringPluginFactory;
 import org.springplugin.core.env.properties.SpringPluginProperties;
-import org.springplugin.core.factory.SpringPluginFactory;
 import org.springplugin.core.springdoc.SpringDocBeanPostProcessor;
 import org.springplugin.core.springdoc.SpringPluginWebMvcProvider;
 

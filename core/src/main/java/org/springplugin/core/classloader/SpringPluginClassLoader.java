@@ -22,8 +22,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.core.SmartClassLoader;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springplugin.core.PluginFuture;
 import org.springplugin.core.autoconfigure.ImportCandidates;
+import org.springplugin.core.context.NamedFuture;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.util.ClassUtils;
 
@@ -110,7 +110,7 @@ public class SpringPluginClassLoader extends PluginClassLoader implements SmartC
      */
     @NonNull
     public static PluginClassLoader getInstance(String name) {
-        final String fn = PluginFuture.get(name);
+        final String fn = NamedFuture.get(name);
         if (PluginClassLoaderFactory.has(fn)) {
             return PluginClassLoaderFactory.get(fn);
         }

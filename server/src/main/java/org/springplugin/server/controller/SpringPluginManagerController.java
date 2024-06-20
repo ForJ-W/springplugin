@@ -25,11 +25,13 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springplugin.core.PluginFuture;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
+import org.springplugin.core.context.NamedFuture;
 import org.springplugin.core.context.PluginContext;
 import org.springplugin.core.exception.SpringPluginException;
-import org.springplugin.core.info.DefaultPluginInfo;
+import org.springplugin.core.info.FilePluginInfo;
+import org.springplugin.core.info.PluginInfo;
+import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.AssertUtils;
 
 import java.io.File;
@@ -59,7 +61,7 @@ public class SpringPluginManagerController {
      * @author afěi
      */
     @PostMapping(value = "load", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String load(@RequestPart("file") MultipartFile file) throws IOException {
+    public String load(@RequestPart("file") MultipartFile file, @RequestParam(required = false) String mainClass) throws IOException {
 
         AssertUtils.isNotNull(file, new SpringPluginException("file must not be null"));
         final String originalFilename = file.getOriginalFilename();
@@ -70,16 +72,14 @@ public class SpringPluginManagerController {
         String plugin;
         try {
             FileUtils.writeByteArrayToFile(jarFilePath, file.getBytes());
-            plugin = originalFilename.split("\\.")[0];
-            if (PluginFuture.FUTURE_NODES.containsKey(plugin)) {
-                plugin = PluginFuture.FLAG + plugin;
-            }
+            plugin = NamedFuture.get(originalFilename.split("\\.")[0]);
             try (ZipFile zipFile = new ZipFile(jarFilePath)) {
                 zipFile.extractAll(SpringPluginClassLoader.LOAD_PATH + plugin);
             }
-            final DefaultPluginInfo dpi = DefaultPluginInfo.of(plugin);
-            if (!pc.load(dpi)) {
-                pc.unload(dpi);
+            final PluginInfo pi = new FilePluginInfo(plugin, mainClass);
+            PluginInfoFactory.set(plugin, pi);
+            if (!pc.load(pi)) {
+                pc.unload(pi);
                 return "load plugin fail";
             }
         } finally {
@@ -102,7 +102,7 @@ public class SpringPluginManagerController {
     @PostMapping("unload")
     public String unload(@RequestParam("name") String name) {
 
-        if (!pc.unload(DefaultPluginInfo.of(name))) {
+        if (!pc.unload(PluginInfoFactory.get(name))) {
             return "unload plugin fail: " + name;
         }
         final String successMessage = "unload plugin success: " + name;

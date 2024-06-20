@@ -15,7 +15,7 @@
  *
  */
 
-package org.springplugin.core.factory;
+package org.springplugin.core.context;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

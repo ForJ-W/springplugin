@@ -20,8 +20,8 @@ package org.springplugin.core.util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.lang.NonNull;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
+import org.springplugin.core.context.SpringPluginFactory;
 import org.springplugin.core.exception.SpringPluginException;
-import org.springplugin.core.factory.SpringPluginFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

@@ -99,7 +99,7 @@ public class SpringPluginProperties {
         /**
          * 插件拦截身份验证模式
          */
-        private IdentityMode identityMode = IdentityMode.URL;
+        private IdentityMode identityMode = IdentityMode.HEADER;
 
         /**
          * 插件拦截白名单

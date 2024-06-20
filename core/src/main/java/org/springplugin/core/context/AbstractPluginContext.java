@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0.0
  */
 @Slf4j
-public abstract class AbstractPluginContext implements PluginContext {
+public abstract class AbstractPluginContext extends NamedFuture implements PluginContext {
 
     /**
      * 被过滤的注解

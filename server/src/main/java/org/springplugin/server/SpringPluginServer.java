@@ -26,7 +26,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
 import org.springplugin.core.context.PluginContext;
 import org.springplugin.core.exception.SpringPluginException;
-import org.springplugin.core.info.DefaultPluginInfo;
+import org.springplugin.core.info.FilePluginInfo;
+import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.AssertUtils;
 
 import java.io.File;
@@ -63,7 +64,9 @@ public class SpringPluginServer implements ApplicationRunner {
                 .forEach(f -> {
                     final String name = f.getName();
                     try {
-                        pluginContext.load(DefaultPluginInfo.of(name));
+                        final FilePluginInfo fif = new FilePluginInfo(name, null);
+                        PluginInfoFactory.set(name, fif);
+                        pluginContext.load(PluginInfoFactory.get(name));
                     } catch (Exception e) {
                         log.error("Plugin init load fail, {}", name);
                     }

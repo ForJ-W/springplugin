@@ -122,8 +122,7 @@ public class PluginClassScanner extends ClassPathBeanDefinitionScanner {
         Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
         if (beanDefinitions.isEmpty()) {
-            LOGGER.warn("No plugin was found in '" + Arrays.toString(basePackages)
-                    + "' package. Please check your configuration.");
+            LOGGER.warn("No plugin was found in '{}' package. Please check your configuration.", Arrays.toString(basePackages));
         } else {
             processBeanDefinitions(beanDefinitions);
         }
@@ -184,8 +183,7 @@ public class PluginClassScanner extends ClassPathBeanDefinitionScanner {
         if (super.checkCandidate(beanName, beanDefinition)) {
             return true;
         } else {
-            LOGGER.warn("Skipping plugin bean with name '" + beanName + "' and '"
-                    + beanDefinition.getBeanClassName() + "' class" + ". Bean already defined with the same name!");
+            LOGGER.debug("Skipping plugin bean with name '{}' and '{}' class. Bean already defined with the same name!", beanName, beanDefinition.getBeanClassName());
             return false;
         }
     }
