@@ -17,7 +17,7 @@
 
 package org.springplugin.core.springdoc;
 
-import org.springdoc.webmvc.core.providers.SpringWebMvcProvider;
+import org.springdoc.webmvc.core.SpringWebMvcProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;

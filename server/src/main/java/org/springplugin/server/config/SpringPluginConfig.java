@@ -20,10 +20,10 @@ package org.springplugin.server.config;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springplugin.core.contant.PluginConstant;
@@ -48,7 +48,7 @@ public class SpringPluginConfig {
     @Bean
     public PluginContext pluginContext(SpringPluginFactory springPluginFactory, SpringPluginProperties configProps) {
 
-        return new SpringNamedContext(springPluginFactory, configProps)
+        return new SpringPluginContext(springPluginFactory, configProps)
                 .addFilterAnnotation(SpringBootApplication.class)
                 .addFilterAnnotation(EnableAutoConfiguration.class);
     }
@@ -85,8 +85,8 @@ public class SpringPluginConfig {
      * @author afěi
      */
     @Bean
-    @ConditionalOnProperty(prefix = SpringPluginProperties.PREFIX, name = "intercept.identity-mode", havingValue = "HEADER")
-    public OpenApiCustomizer openApiCustomizer() {
+    @ConditionalOnExpression("'${spring.plugin.intercept.identity-mode}'.equalsIgnoreCase('header')")
+    public OpenApiCustomiser openApiCustomizer() {
 
         return openApi -> openApi.getPaths()
                 .values()

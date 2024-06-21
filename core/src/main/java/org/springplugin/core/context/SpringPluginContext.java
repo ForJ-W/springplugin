@@ -43,7 +43,7 @@ import java.util.Optional;
  * @version 1.0.0
  */
 @Slf4j
-public class SpringNamedContext extends AbstractPluginContext implements PluginContext {
+public class SpringPluginContext extends AbstractPluginContext implements PluginContext {
 
     /**
      * spring 插件属性配置类
@@ -62,7 +62,7 @@ public class SpringNamedContext extends AbstractPluginContext implements PluginC
      * @param pluginProperties    spring 插件属性配置类
      * @author afěi
      */
-    public SpringNamedContext(SpringPluginFactory springPluginFactory, SpringPluginProperties pluginProperties) {
+    public SpringPluginContext(SpringPluginFactory springPluginFactory, SpringPluginProperties pluginProperties) {
         this.springPluginFactory = springPluginFactory;
         this.pluginProperties = pluginProperties;
     }
@@ -105,7 +105,8 @@ public class SpringNamedContext extends AbstractPluginContext implements PluginC
             log.error(String.format("unload spring plugin fail, %s", name), e);
             return false;
         } finally {
-            if (classLoader instanceof PluginClassLoader pluginClassLoader) {
+            if (classLoader instanceof PluginClassLoader) {
+                PluginClassLoader pluginClassLoader = (PluginClassLoader) classLoader;
                 try {
                     IOUtils.close(pluginClassLoader);
                 } catch (IOException e) {

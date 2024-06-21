@@ -17,7 +17,7 @@
 
 package org.springplugin.core.springdoc;
 
-import org.springdoc.core.properties.SpringDocConfigProperties;
+import org.springdoc.core.SpringDocConfigProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
@@ -34,7 +34,8 @@ public class SpringDocBeanPostProcessor implements BeanPostProcessor {
     @Nullable
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
-        if (bean instanceof SpringDocConfigProperties springDocConfigProps) {
+        if (bean instanceof SpringDocConfigProperties) {
+            SpringDocConfigProperties springDocConfigProps = (SpringDocConfigProperties) bean;
             final SpringDocConfigProperties.Cache cache = springDocConfigProps.getCache();
             if (!cache.isDisabled()) {
                 cache.setDisabled(true);

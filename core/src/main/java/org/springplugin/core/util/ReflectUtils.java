@@ -28,6 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -153,7 +154,7 @@ public abstract class ReflectUtils extends ReflectionUtils {
         String parameterTypeNameListStr = Arrays.stream(parameters)
                 .map(Parameter::getType)
                 .map(Class::getName)
-                .toList()
+                .collect(Collectors.toList())
                 .toString();
         return parameterTypeNameListStr.substring(1, parameterTypeNameListStr.length() - 1);
     }

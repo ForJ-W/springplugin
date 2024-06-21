@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 插件扫描注册器
@@ -125,11 +126,11 @@ public class PluginScannerRegistrar implements ImportBeanDefinitionRegistrar {
         builder.addPropertyValue("nameGenerator", BeanUtils.instantiateClass(generatorClass));
 
         List<String> basePackages = new ArrayList<>();
-        basePackages.addAll(Arrays.stream(annoAttrs.getStringArray("value")).filter(StringUtils::hasText).toList());
+        basePackages.addAll(Arrays.stream(annoAttrs.getStringArray("value")).filter(StringUtils::hasText).collect(Collectors.toList()));
 
-        basePackages.addAll(Arrays.stream(annoAttrs.getStringArray("basePackages")).filter(StringUtils::hasText).toList());
+        basePackages.addAll(Arrays.stream(annoAttrs.getStringArray("basePackages")).filter(StringUtils::hasText).collect(Collectors.toList()));
 
-        basePackages.addAll(Arrays.stream(annoAttrs.getClassArray("basePackageClasses")).map(ClassUtils::getPackageName).toList());
+        basePackages.addAll(Arrays.stream(annoAttrs.getClassArray("basePackageClasses")).map(ClassUtils::getPackageName).collect(Collectors.toList()));
 
         if (basePackages.isEmpty()) {
             basePackages.add(getDefaultBasePackage(annoMeta));

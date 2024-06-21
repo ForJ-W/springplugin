@@ -22,10 +22,10 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
-import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.providers.SpringWebProvider;
-import org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration;
-import org.springdoc.webmvc.core.providers.SpringWebMvcProvider;
+import org.springdoc.webmvc.core.SpringDocWebMvcConfiguration;
+import org.springdoc.webmvc.core.SpringWebMvcProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.*;
@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springplugin.core.contant.PluginConstant;
 import org.springplugin.core.context.SpringPluginFactory;
-import org.springplugin.core.env.properties.SpringPluginProperties;
 import org.springplugin.core.springdoc.SpringDocBeanPostProcessor;
 import org.springplugin.core.springdoc.SpringPluginWebMvcProvider;
 
@@ -113,8 +112,8 @@ public class SpringPluginSpringdocAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = SpringPluginProperties.PREFIX, name = "intercept.identity-mode", havingValue = "HEADER")
-    public OpenApiCustomizer openApiCustomizer() {
+    @ConditionalOnExpression("'${spring.plugin.intercept.identity-mode}'.toString().equalsIgnoreCase('header')")
+    public OpenApiCustomiser openApiCustomizer() {
 
         return openApi -> openApi.getPaths()
                 .values()

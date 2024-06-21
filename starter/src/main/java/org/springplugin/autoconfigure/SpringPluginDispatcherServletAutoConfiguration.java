@@ -17,7 +17,6 @@
 
 package org.springplugin.autoconfigure;
 
-import jakarta.servlet.ServletRegistration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -41,6 +40,7 @@ import org.springplugin.core.context.SpringPluginFactory;
 import org.springplugin.core.env.properties.SpringPluginProperties;
 import org.springplugin.core.mvc.PluginDispatcherServlet;
 
+import javax.servlet.ServletRegistration;
 import java.util.Arrays;
 import java.util.List;
 

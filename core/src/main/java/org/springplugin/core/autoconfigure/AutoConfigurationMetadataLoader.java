@@ -66,7 +66,13 @@ final class AutoConfigurationMetadataLoader {
      * <p>
      * {@link org.springframework.boot.autoconfigure.AutoConfigurationMetadataLoader.PropertiesAutoConfigurationMetadata}
      */
-    private record PropertiesAutoConfigurationMetadata(Properties properties) implements AutoConfigurationMetadata {
+    private static class PropertiesAutoConfigurationMetadata implements AutoConfigurationMetadata {
+
+        private final Properties properties;
+
+        public PropertiesAutoConfigurationMetadata(Properties properties) {
+            this.properties = properties;
+        }
 
         @Override
         public boolean wasProcessed(String className) {

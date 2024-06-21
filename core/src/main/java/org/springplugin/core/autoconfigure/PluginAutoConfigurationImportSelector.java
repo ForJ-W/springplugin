@@ -139,16 +139,20 @@ public class PluginAutoConfigurationImportSelector implements DeferredImportSele
      */
     private void invokeAwareMethods(Object instance) {
         if (instance instanceof Aware) {
-            if (instance instanceof BeanClassLoaderAware beanClassLoaderAwareInstance) {
+            if (instance instanceof BeanClassLoaderAware) {
+                BeanClassLoaderAware beanClassLoaderAwareInstance = (BeanClassLoaderAware) instance;
                 beanClassLoaderAwareInstance.setBeanClassLoader(this.beanClassLoader);
             }
-            if (instance instanceof BeanFactoryAware beanFactoryAwareInstance) {
+            if (instance instanceof BeanFactoryAware) {
+                BeanFactoryAware beanFactoryAwareInstance = (BeanFactoryAware) instance;
                 beanFactoryAwareInstance.setBeanFactory(this.beanFactory);
             }
-            if (instance instanceof EnvironmentAware environmentAwareInstance) {
+            if (instance instanceof EnvironmentAware) {
+                EnvironmentAware environmentAwareInstance = (EnvironmentAware) instance;
                 environmentAwareInstance.setEnvironment(this.environment);
             }
-            if (instance instanceof ResourceLoaderAware resourceLoaderAwareInstance) {
+            if (instance instanceof ResourceLoaderAware) {
+                ResourceLoaderAware resourceLoaderAwareInstance = (ResourceLoaderAware) instance;
                 resourceLoaderAwareInstance.setResourceLoader(this.resourceLoader);
             }
         }

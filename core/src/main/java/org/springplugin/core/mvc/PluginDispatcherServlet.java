@@ -17,8 +17,6 @@
 
 package org.springplugin.core.mvc;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -38,6 +36,8 @@ import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.util.ClassUtils;
 import org.springplugin.core.util.ReflectUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -87,11 +87,18 @@ public class PluginDispatcherServlet extends DispatcherServlet {
         final SpringPluginProperties.Intercept intercept = pluginProps.getIntercept();
         final String identityKey = intercept.getIdentityKey();
         final String uri = request.getRequestURI();
-        final String plugin = switch (intercept.getIdentityMode()) {
-            case HEADER -> request.getHeader(identityKey);
-            case PARAMETER -> request.getParameter(identityKey);
-            default -> "/".equals(uri) ? null : uri.split("/")[1];
-        };
+        String plugin;
+        switch (intercept.getIdentityMode()) {
+            case HEADER:
+                plugin = request.getHeader(identityKey);
+                break;
+            case PARAMETER:
+                plugin = request.getParameter(identityKey);
+                break;
+            default:
+                plugin = "/".equals(uri) ? null : uri.split("/")[1];
+                break;
+        }
         if (PluginClassLoaderFactory.has(plugin)) {
             Thread.currentThread().setContextClassLoader(SpringPluginClassLoader.getInstance(plugin));
             // 获取指定插件的应用上下文中的处理器方法
@@ -141,7 +148,8 @@ public class PluginDispatcherServlet extends DispatcherServlet {
         final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
         final List<HandlerMapping> handlerMappings = new ArrayList<>(beanFactory.getBeansOfType(HandlerMapping.class).values());
         for (HandlerMapping handlerMapping : handlerMappings) {
-            if (handlerMapping instanceof AbstractHandlerMapping abstractHandlerMapping) {
+            if (handlerMapping instanceof AbstractHandlerMapping) {
+                AbstractHandlerMapping abstractHandlerMapping = (AbstractHandlerMapping) handlerMapping;
                 for (WebMvcConfigurer webMvcConfigurer : beanFactory.getBeansOfType(WebMvcConfigurer.class).values()) {
                     // 获取并添加所有插件自己的拦截器
                     final InterceptorRegistry registry = new InterceptorRegistry();

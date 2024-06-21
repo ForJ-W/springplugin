@@ -143,7 +143,8 @@ public class PluginClassScanner extends ClassPathBeanDefinitionScanner {
 
             final AbstractBeanDefinition definition = (AbstractBeanDefinition) holder.getBeanDefinition();
             resolveBeanClass(definition);
-            if (definition instanceof RootBeanDefinition rbd) {
+            if (definition instanceof RootBeanDefinition) {
+                RootBeanDefinition rbd = (RootBeanDefinition) definition;
                 final BeanDefinitionHolder decoratedDefinitionHolder = rbd.getDecoratedDefinition();
                 if (Objects.nonNull(decoratedDefinitionHolder)) {
                     resolveBeanClass((AbstractBeanDefinition) decoratedDefinitionHolder.getBeanDefinition());

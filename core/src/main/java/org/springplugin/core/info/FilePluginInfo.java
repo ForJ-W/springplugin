@@ -18,16 +18,51 @@ import java.util.Optional;
  * @author afěi
  * @version 1.0.0
  */
-public record FilePluginInfo(String name, String mainClassName) implements PluginInfo {
 
+public class FilePluginInfo implements PluginInfo {
+
+    private final String name;
+    private final String mainClassName;
     private static final Gson GSON = new Gson();
 
-    public FilePluginInfo {
-        try {
-            writeInfo(this);
-        } catch (IOException e) {
-            throw new PluginException("Write file fail: '.info'", e);
+    private FilePluginInfo(String name, String mainClassName) {
+        this.name = name;
+        this.mainClassName = mainClassName;
+    }
+
+    /**
+     * 创建文件插件信息
+     *
+     * @param name 插件名
+     * @param mainClassName 主类名
+     *
+     */
+    public static PluginInfo create(String name, String mainClassName) {
+        final FilePluginInfo fif = new FilePluginInfo(name, mainClassName);
+        if (StringUtils.isNotBlank(mainClassName)) {
+            final File pluginPath = new File(SpringPluginClassLoader.LOAD_PATH, name);
+            final File infoFile = new File(pluginPath, ".info");
+            if (!infoFile.exists()) {
+                try {
+                    FileUtils.writeStringToFile(infoFile, GSON.toJson(fif), StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new PluginException("Write file fail: '.info'", e);
+                }
+            }
         }
+        return fif;
+    }
+
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+    @Override
+    public Class<?> mainClass() throws ClassNotFoundException {
+        return StringUtils.isNotBlank(this.mainClassName)
+                ? SpringPluginClassLoader.getInstance(name()).forName(mainClassName())
+                : PluginInfo.super.mainClass();
     }
 
     @Override
@@ -41,35 +76,11 @@ public record FilePluginInfo(String name, String mainClassName) implements Plugi
             final File infoFile = new File(pluginPath, ".info");
             if (infoFile.exists()) {
                 final String fileContent = FileUtils.readFileToString(new File(pluginPath, ".info"), StandardCharsets.UTF_8);
-                return Optional.ofNullable(GSON.fromJson(fileContent, PluginInfo.class)).orElseThrow(() -> pe).mainClassName();
+                return Optional.ofNullable(GSON.fromJson(fileContent, this.getClass())).orElseThrow(() -> pe).mainClassName();
             }
         } catch (IOException e) {
             throw new PluginException(String.format("Can not find plugin '%s'", name), e);
         }
         return null;
-    }
-
-    @Override
-    public Class<?> mainClass() throws ClassNotFoundException {
-        return StringUtils.isNotBlank(this.mainClassName)
-                ? SpringPluginClassLoader.getInstance(name()).forName(mainClassName())
-                : PluginInfo.super.mainClass();
-    }
-
-
-    /**
-     * 写入一份.info的描述文件
-     *
-     * @param info 插件信息
-     *
-     * @throws IOException 写文件时可能抛出的IO异常
-     */
-    private void writeInfo(PluginInfo info) throws IOException {
-        final String name = info.name();
-        final String mainClassName = info.mainClassName();
-        if (StringUtils.isNotBlank(mainClassName)) {
-            final File pluginPath = new File(SpringPluginClassLoader.LOAD_PATH, name);
-            FileUtils.writeStringToFile(new File(pluginPath, ".info"), GSON.toJson(info), StandardCharsets.UTF_8);
-        }
     }
 }

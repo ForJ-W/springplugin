@@ -38,11 +38,12 @@ import java.util.function.BiConsumer;
 /**
  * javassist字节码
  *
- * @param pool 类对象池
  * @author afěi
  * @version 1.0.0
  */
-public record JavassistBytecode(ClassPool pool) implements ByteCode {
+public class JavassistBytecode implements ByteCode {
+
+    private final ClassPool pool;
 
     /**
      * 构造方法
@@ -50,7 +51,8 @@ public record JavassistBytecode(ClassPool pool) implements ByteCode {
      * @param pool 类对象池
      * @author afěi
      */
-    public JavassistBytecode {
+    public JavassistBytecode(ClassPool pool) {
+        this.pool = pool;
     }
 
     @Override

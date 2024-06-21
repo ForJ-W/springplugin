@@ -17,19 +17,24 @@
 
 package org.springplugin.core.context;
 
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.cloud.context.named.NamedContextFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigRegistry;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.info.PluginInfo;
@@ -37,6 +42,7 @@ import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.SpringIocUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Spring插件工厂
@@ -75,12 +81,18 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     /**
      * {@link  NamedContextFactory#applicationContextInitializers}
      */
-    protected final Map<String, ApplicationContextInitializer<GenericApplicationContext>> applicationContextInitializers;
+    protected final Map<String, ApplicationContextInitializer<AnnotationConfigApplicationContext>> applicationContextInitializers = new ConcurrentHashMap<>();
 
     /**
      * {@link NamedContextFactory#contexts}
      */
-    protected final Map<String, GenericApplicationContext> contexts;
+    protected final Map<String, AnnotationConfigApplicationContext> contexts;
+
+    /**
+     * {@link NamedContextFactory#configurations}
+     */
+    private final Map<String, SpringPluginFactorySpec> configurations;
+
 
     /**
      * 构造方法
@@ -90,23 +102,22 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     @SuppressWarnings("unchecked")
     public SpringPluginFactory() {
         super(DEFAULT_CONFIG_TYPE, PROPERTY_SOURCE_NAME, PROPERTY_NAME);
-        // 反射获取私有核心属性 上下文初始化器和上下文容器
-        final String applicationContextInitializersErrorMessage = "Can not initialize applicationContextInitializers";
-        this.applicationContextInitializers = Optional.ofNullable(ReflectionUtils.findField(NamedContextFactory.class, "applicationContextInitializers", Map.class))
-                .map(f -> {
-                    f.setAccessible(true);
-                    try {
-                        return (Map<String, ApplicationContextInitializer<GenericApplicationContext>>) f.get(this);
-                    } catch (IllegalAccessException e) {
-                        throw new SpringPluginException(applicationContextInitializersErrorMessage, e);
-                    }
-                }).orElseThrow(() -> new SpringPluginException(applicationContextInitializersErrorMessage));
         final String contextsErrorMessage = "Can not initialize applicationContextInitializers";
         this.contexts = Optional.ofNullable(ReflectionUtils.findField(NamedContextFactory.class, "contexts", Map.class))
                 .map(f -> {
                     f.setAccessible(true);
                     try {
-                        return (Map<String, GenericApplicationContext>) f.get(this);
+                        return (Map<String, AnnotationConfigApplicationContext>) f.get(this);
+                    } catch (IllegalAccessException e) {
+                        throw new SpringPluginException(contextsErrorMessage, e);
+                    }
+                }).orElseThrow(() -> new SpringPluginException(contextsErrorMessage));
+
+        this.configurations = Optional.ofNullable(ReflectionUtils.findField(NamedContextFactory.class, "configurations", Map.class))
+                .map(f -> {
+                    f.setAccessible(true);
+                    try {
+                        return (Map<String, SpringPluginFactorySpec>) f.get(this);
                     } catch (IllegalAccessException e) {
                         throw new SpringPluginException(contextsErrorMessage, e);
                     }
@@ -136,7 +147,6 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
         if (Objects.isNull(instance)) {
             synchronized (SpringPluginFactory.class) {
                 if (Objects.isNull(instance)) {
-
                     return instance = SpringIocUtils.mustGetBean(SpringPluginFactory.class);
                 }
             }
@@ -177,12 +187,66 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     }
 
     @Override
-    public synchronized GenericApplicationContext createContext(String name) {
-        final GenericApplicationContext context = super.createContext(name);
-        callRunners(context, new DefaultApplicationArguments());
+    public AnnotationConfigApplicationContext createContext(String name) {
+        name = NamedFuture.get(name);
+        final ConfigurableApplicationContext parent = (ConfigurableApplicationContext) getParent();
+        this.applicationContextInitializers.put(name, parent.getBean(SpringPluginChildContextInitializer.class));
+        AnnotationConfigApplicationContext context = buildContext(name);
+        if (applicationContextInitializers.get(name) != null) {
+            applicationContextInitializers.get(name).initialize(context);
+            context.refresh();
+            return context;
+        }
+        registerBeans(name, context);
+        context.refresh();
         return context;
     }
 
+    public void registerBeans(String name, GenericApplicationContext context) {
+        Assert.isInstanceOf(AnnotationConfigRegistry.class, context);
+        AnnotationConfigRegistry registry = (AnnotationConfigRegistry) context;
+        if (this.configurations.containsKey(name)) {
+            for (Class<?> configuration : this.configurations.get(name).getConfiguration()) {
+                registry.register(configuration);
+            }
+        }
+        for (Map.Entry<String, SpringPluginFactorySpec> entry : this.configurations.entrySet()) {
+            if (entry.getKey().startsWith("default.")) {
+                for (Class<?> configuration : entry.getValue().getConfiguration()) {
+                    registry.register(configuration);
+                }
+            }
+        }
+        registry.register(PropertyPlaceholderAutoConfiguration.class, DEFAULT_CONFIG_TYPE);
+    }
+
+    public AnnotationConfigApplicationContext buildContext(String name) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        AnnotationConfigApplicationContext context;
+        final ApplicationContext parent = getParent();
+        if (parent != null) {
+            DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+            if (parent instanceof ConfigurableApplicationContext) {
+                beanFactory.setBeanClassLoader(
+                        ((ConfigurableApplicationContext) parent).getBeanFactory().getBeanClassLoader());
+            } else {
+                beanFactory.setBeanClassLoader(classLoader);
+            }
+            context = new AnnotationConfigApplicationContext(beanFactory);
+        } else {
+            context = new AnnotationConfigApplicationContext();
+        }
+        context.setClassLoader(classLoader);
+        registerBeans(name, context);
+        context.getEnvironment().getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME,
+                Collections.singletonMap(PROPERTY_NAME, name)));
+        if (parent != null) {
+            // Uses Environment from parent as well as beans
+            context.setParent(parent);
+        }
+        context.setDisplayName(generateDisplayName(name));
+        return context;
+    }
     /**
      * 调用Runner相关接口
      *
@@ -196,10 +260,12 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
         runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
         AnnotationAwareOrderComparator.sort(runners);
         for (Object runner : new LinkedHashSet<>(runners)) {
-            if (runner instanceof ApplicationRunner applicationRunner) {
+            if (runner instanceof ApplicationRunner) {
+                ApplicationRunner applicationRunner = (ApplicationRunner) runner;
                 callRunner(applicationRunner, args);
             }
-            if (runner instanceof CommandLineRunner commandLineRunner) {
+            if (runner instanceof CommandLineRunner) {
+                CommandLineRunner commandLineRunner = (CommandLineRunner) runner;
                 callRunner(commandLineRunner, args);
             }
         }
@@ -234,15 +300,7 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     }
 
     @Override
-    public GenericApplicationContext buildContext(String name) {
-        name = NamedFuture.get(name);
-        final ConfigurableApplicationContext parent = (ConfigurableApplicationContext) getParent();
-        this.applicationContextInitializers.put(name, parent.getBean(SpringPluginChildContextInitializer.class));
-        return super.buildContext(name);
-    }
-
-    @Override
-    public GenericApplicationContext getContext(String name) {
+    public AnnotationConfigApplicationContext getContext(String name) {
         name = NamedFuture.get(name);
         if (!this.contexts.containsKey(name)) {
             throw new SpringPluginException(String.format("The current plugin does not exist, %s", name));

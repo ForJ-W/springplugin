@@ -228,7 +228,8 @@ public class SpringAwareUtils implements Ordered, ApplicationContextInitializer<
                     }
                     List<PropertySource<?>> sourceList = new ArrayList<>();
                     for (PropertySource<?> p : source) {
-                        if (p instanceof EnumerablePropertySource<?> enumerable) {
+                        if (p instanceof EnumerablePropertySource<?>) {
+                            EnumerablePropertySource<?> enumerable = (EnumerablePropertySource<?>) p;
                             sourceList.add(new BootstrapPropertySource<>(enumerable));
                         } else {
                             sourceList.add(new SimpleBootstrapPropertySource<>(p));

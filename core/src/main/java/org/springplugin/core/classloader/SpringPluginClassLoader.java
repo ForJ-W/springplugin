@@ -212,7 +212,8 @@ public class SpringPluginClassLoader extends PluginClassLoader implements SmartC
         // 从ucs列表加载类
         for (URLConnection uc : ucs) {
             try {
-                if (uc instanceof JarURLConnection jar) {
+                if (uc instanceof JarURLConnection) {
+                    JarURLConnection jar = (JarURLConnection) uc;
                     JarFile jarFile = jar.getJarFile();
                     String entryName = jar.getEntryName();
                     if (entryName == null) {

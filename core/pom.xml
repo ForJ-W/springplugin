@@ -34,7 +34,7 @@
 
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <artifactId>springdoc-openapi-webmvc-core</artifactId>
             <optional>true</optional>
         </dependency>
 

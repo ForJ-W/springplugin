@@ -31,7 +31,10 @@ import org.springplugin.core.util.StringUtils;
  * @param mainClassName
 主类名称
  */
-public record DefaultPluginInfo(String name, String mainClassName) implements PluginInfo {
+public class DefaultPluginInfo implements PluginInfo {
+    private final String name;
+    private final String mainClassName;
+
 
     /**
      * 构造方法
@@ -40,8 +43,20 @@ public record DefaultPluginInfo(String name, String mainClassName) implements Pl
      * @param mainClassName 主类名称
      * @author afěi
      */
-    public DefaultPluginInfo {
+    public DefaultPluginInfo(String name, String mainClassName) {
         AssertUtils.isTrue(StringUtils.isNotBlank(name), "The plugin name cannot be empty");
+        this.name = name;
+        this.mainClassName = mainClassName;
+    }
+
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+    @Override
+    public String mainClassName() {
+        return this.mainClassName;
     }
 
     /**

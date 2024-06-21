@@ -76,7 +76,7 @@ public class SpringPluginManagerController {
             try (ZipFile zipFile = new ZipFile(jarFilePath)) {
                 zipFile.extractAll(SpringPluginClassLoader.LOAD_PATH + plugin);
             }
-            final PluginInfo pi = new FilePluginInfo(plugin, mainClass);
+            final PluginInfo pi = FilePluginInfo.create(plugin, mainClass);
             PluginInfoFactory.set(plugin, pi);
             if (!pc.load(pi)) {
                 pc.unload(pi);

@@ -19,6 +19,7 @@ package org.springplugin.core.context;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springplugin.core.classloader.PluginClassLoader;
@@ -37,7 +38,7 @@ import java.util.Collections;
  * @version 1.0.0
  */
 @RequiredArgsConstructor
-public class SpringPluginChildContextInitializer implements ApplicationContextInitializer<GenericApplicationContext> {
+public class SpringPluginChildContextInitializer implements ApplicationContextInitializer<AnnotationConfigApplicationContext> {
 
     /**
      * Spring插件工厂
@@ -50,7 +51,7 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
     private final SpringPluginFactoryCommonSpec commonSpec;
 
     @Override
-    public void initialize(@NonNull GenericApplicationContext context) {
+    public void initialize(@NonNull AnnotationConfigApplicationContext context) {
 
         final PluginInfo pi = SpringPluginFactory.getPluginInfo(context);
         final String name = pi.name();
@@ -79,6 +80,6 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
         context.setClassLoader(classLoader);
         context.getBeanFactory().setBeanClassLoader(classLoader);
         context.registerBean(mainClass.getName(), mainClass);
-        this.contextFactory.registerBeans(name, context);
+        contextFactory.registerBeans(name, context);
     }
 }

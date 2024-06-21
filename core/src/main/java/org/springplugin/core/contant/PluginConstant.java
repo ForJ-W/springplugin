@@ -28,7 +28,7 @@ public interface PluginConstant {
     /**
      * 插件元信息头
      */
-    String META_HEADER = "Plugin-Meta";
+    String META_HEADER = "plugin-meta";
 
     /**
      * classes目录名

@@ -145,7 +145,8 @@ public class PluginClassLoader extends URLClassLoader {
             remove.close();
         }
         for (URLConnection uc : this.ucs) {
-            if (uc instanceof JarURLConnection jar) {
+            if (uc instanceof JarURLConnection) {
+                JarURLConnection jar = (JarURLConnection) uc;
                 jar.getJarFile().close();
 
             } else {
