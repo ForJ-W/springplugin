@@ -79,7 +79,6 @@ public class SpringPluginManagerController {
             final PluginInfo pi = FilePluginInfo.create(plugin, mainClass);
             PluginInfoFactory.set(plugin, pi);
             if (!pc.load(pi)) {
-                pc.unload(pi);
                 return "load plugin fail";
             }
         } finally {

@@ -25,7 +25,6 @@ import org.springplugin.core.classloader.PluginClassLoader;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
 import org.springplugin.core.env.properties.SpringPluginProperties;
 import org.springplugin.core.info.PluginInfo;
-import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.ClassUtils;
 
 import java.io.File;
@@ -82,15 +81,10 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
             log.info("load spring plugin success, {}", name);
         } catch (Throwable e) {
             log.error(String.format("load spring plugin fail, %s", name), e);
+            reset(name);
             return false;
         }
         return true;
-    }
-
-    @Override
-    protected void reset(String name) {
-
-        unload(PluginInfoFactory.get(name));
     }
 
     @Override
@@ -99,6 +93,7 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
         final String name = info.name();
         checkContextClassLoader(name);
         final ClassLoader classLoader = ClassUtils.currentClassLoader();
+        boolean success = true;
         try {
             springPluginFactory.destroy(name);
         } catch (Throwable e) {
@@ -115,10 +110,10 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
             }
             if (!FileUtils.deleteQuietly(new File(SpringPluginClassLoader.LOAD_PATH + name))) {
                 log.error("unload plugin fail, can't delete plugin file: {}", name);
-                return false;
+                success = false;
             }
         }
-        return true;
+        return success;
     }
 
     @Override

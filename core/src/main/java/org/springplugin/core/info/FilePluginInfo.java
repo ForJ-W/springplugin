@@ -76,7 +76,8 @@ public class FilePluginInfo implements PluginInfo {
             final File infoFile = new File(pluginPath, ".info");
             if (infoFile.exists()) {
                 final String fileContent = FileUtils.readFileToString(new File(pluginPath, ".info"), StandardCharsets.UTF_8);
-                return Optional.ofNullable(GSON.fromJson(fileContent, this.getClass())).orElseThrow(() -> pe).mainClassName();
+                final FilePluginInfo fif = Optional.ofNullable(GSON.fromJson(fileContent, this.getClass())).orElseThrow(() -> pe);
+                return fif.mainClassName;
             }
         } catch (IOException e) {
             throw new PluginException(String.format("Can not find plugin '%s'", name), e);

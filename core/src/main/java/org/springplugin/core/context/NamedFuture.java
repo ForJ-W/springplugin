@@ -93,7 +93,9 @@ public abstract class NamedFuture {
      *
      * @param name 名称
      */
-    protected abstract void reset(String name);
+    protected void reset(String name) {
+        FUTURE_NODES.remove(name);
+    }
 
     /**
      * 命名节点
