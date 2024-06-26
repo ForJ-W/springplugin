@@ -54,6 +54,11 @@
             <groupId>org.springplugin</groupId>
             <artifactId>springplugin-mybatisplus-demo-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
