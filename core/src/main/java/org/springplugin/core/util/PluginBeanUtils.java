@@ -87,7 +87,7 @@ public class PluginBeanUtils {
          */
         PluginBeanInvocationHandler(@NonNull Object pluginBean) {
 
-            AssertUtils.isNotNull(pluginBean, new SpringPluginException("Plugin bean must not be null"));
+            AssertUtils.nonNull(pluginBean, new SpringPluginException("Plugin bean must not be null"));
             this.pluginBean = pluginBean;
         }
 

@@ -222,7 +222,6 @@ public class PluginPropertySourceLocator implements PropertySourceLocator {
      */
     private boolean canLoadFileExtension(PropertySourceLoader loader, String extension) {
         return Arrays.stream(loader.getFileExtensions())
-                .anyMatch((fileExtension) -> StringUtils.endsWithIgnoreCase(extension,
-                        fileExtension));
+                .anyMatch((fileExtension) -> StringUtils.endsWithIgnoreCase(extension, fileExtension));
     }
 }
