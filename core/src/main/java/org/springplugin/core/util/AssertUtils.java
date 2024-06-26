@@ -69,7 +69,7 @@ public abstract class AssertUtils {
      * @param pluginException 插件异常{@link PluginException}
      * @author afěi
      */
-    public static void isNotNull(Object obj, PluginException pluginException) {
+    public static void nonNull(Object obj, PluginException pluginException) {
 
         if (Objects.isNull(obj)) {
 
