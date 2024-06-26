@@ -23,10 +23,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
 import org.springplugin.core.context.PluginContext;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.info.FilePluginInfo;
+import org.springplugin.core.info.PluginInfo;
 import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.AssertUtils;
 
@@ -39,6 +41,7 @@ import java.util.Set;
  * @version 1.0.0
  */
 @Slf4j
+@PropertySource("classpath:application.yml")
 @SpringBootApplication
 @RequiredArgsConstructor
 public class SpringPluginServer implements ApplicationRunner {
@@ -46,7 +49,6 @@ public class SpringPluginServer implements ApplicationRunner {
     final PluginContext pluginContext;
 
     public static void main(String[] args) {
-
         SpringApplication.run(SpringPluginServer.class, args);
     }
 
@@ -64,9 +66,9 @@ public class SpringPluginServer implements ApplicationRunner {
                 .forEach(f -> {
                     final String name = f.getName();
                     try {
-                        final FilePluginInfo fif = new FilePluginInfo(name, null);
-                        PluginInfoFactory.set(name, fif);
-                        pluginContext.load(PluginInfoFactory.get(name));
+                        final PluginInfo pi = FilePluginInfo.create(name, null);
+                        PluginInfoFactory.set(name, pi);
+                        pluginContext.load(pi);
                     } catch (Exception e) {
                         log.error("Plugin init load fail, {}", name);
                     }
