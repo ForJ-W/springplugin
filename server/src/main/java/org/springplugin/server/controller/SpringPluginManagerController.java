@@ -28,9 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
 import org.springplugin.core.context.NamedFuture;
 import org.springplugin.core.context.PluginContext;
+import org.springplugin.core.env.properties.SpringPluginProperties;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.info.FilePluginInfo;
-import org.springplugin.core.info.PluginInfo;
 import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.AssertUtils;
 
@@ -51,6 +51,7 @@ import java.util.UUID;
 public class SpringPluginManagerController {
 
     private final PluginContext pc;
+    private final SpringPluginProperties springPluginProps;
 
     /**
      * 加载插件
@@ -61,25 +62,36 @@ public class SpringPluginManagerController {
      * @author afěi
      */
     @PostMapping(value = "load", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String load(@RequestPart("file") MultipartFile file, @RequestParam(required = false) String mainClass) throws IOException {
+    public String load(@RequestPart("file") MultipartFile file, @RequestParam(name = "mainClass", required = false) String mainClass) throws IOException {
 
-        AssertUtils.isNotNull(file, new SpringPluginException("file must not be null"));
+        AssertUtils.nonNull(file, new SpringPluginException("file must not be null"));
         final String originalFilename = file.getOriginalFilename();
         AssertUtils.isTrue(Optional.ofNullable(originalFilename).orElse("").endsWith(".jar"), new SpringPluginException("file must be jar"));
+        String plugin = NamedFuture.get(originalFilename.split("\\.")[0]);
+        final File pluginPath = new File(SpringPluginClassLoader.LOAD_PATH, plugin);
+        final String successMessage = "load plugin success: " + plugin;
+        final String failMessage = "load plugin fail: " + plugin;
+        if (springPluginProps.getDebug().isResourceCache() && pluginPath.exists()) {
+            final FilePluginInfo fpi = FilePluginInfo.create(plugin, mainClass);
+            PluginInfoFactory.set(plugin, fpi);
+            if (!pc.load(fpi)) {
+                return failMessage;
+            }
+            log.info(successMessage);
+            return successMessage;
+        }
         final File jarTempPath = new File("temp/" + UUID.randomUUID());
         final File jarFilePath = new File(jarTempPath, originalFilename);
         final boolean deleteQuietly;
-        String plugin;
         try {
+            final FilePluginInfo fpi = FilePluginInfo.create(plugin, mainClass);
             FileUtils.writeByteArrayToFile(jarFilePath, file.getBytes());
-            plugin = NamedFuture.get(originalFilename.split("\\.")[0]);
             try (ZipFile zipFile = new ZipFile(jarFilePath)) {
                 zipFile.extractAll(SpringPluginClassLoader.LOAD_PATH + plugin);
             }
-            final PluginInfo pi = FilePluginInfo.create(plugin, mainClass);
-            PluginInfoFactory.set(plugin, pi);
-            if (!pc.load(pi)) {
-                return "load plugin fail";
+            PluginInfoFactory.set(plugin, fpi);
+            if (!pc.load(fpi)) {
+                return failMessage;
             }
         } finally {
             deleteQuietly = FileUtils.deleteQuietly(jarTempPath);
@@ -87,7 +99,6 @@ public class SpringPluginManagerController {
         if (!deleteQuietly) {
             return "load plugin fail, can't delete temp jar: " + plugin;
         }
-        final String successMessage = "load plugin success: " + plugin;
         log.info(successMessage);
         return successMessage;
     }
