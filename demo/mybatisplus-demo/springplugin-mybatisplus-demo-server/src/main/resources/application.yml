@@ -32,6 +32,7 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
+      - com.alibaba.druid.spring.boot3.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
     druid:
       stat-view-servlet:
@@ -58,7 +59,9 @@ spring:
         poolPreparedStatements: true
         maxPoolPreparedStatementPerConnectionSize: 20
         filters: stat,slf4j
-        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+        connectionProperties:
+          druid.stat.mergeSql: true
+          druid.stat.slowSqlMillis: 5000
       datasource:
         plugin_demo:
           driver-class-name: ${server.mysql.driver-class-name}

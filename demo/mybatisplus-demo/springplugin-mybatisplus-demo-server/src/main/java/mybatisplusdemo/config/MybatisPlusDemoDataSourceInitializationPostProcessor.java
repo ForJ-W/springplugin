@@ -53,7 +53,7 @@ public class MybatisPlusDemoDataSourceInitializationPostProcessor implements Bea
     public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
         // 获取sql初始化属性配置类
-        String databaseKey = "server.mysql.database";
+        final String databaseKey = "server.mysql.database";
         final PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(environment);
         final SqlInitializationProperties initializationProperties = new Binder(ConfigurationPropertySources.from(environment.getPropertySources()), propertySourcesPlaceholdersResolver)
                 .bind("spring.sql.init", SqlInitializationProperties.class).get();
