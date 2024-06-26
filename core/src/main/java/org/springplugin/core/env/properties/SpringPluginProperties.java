@@ -56,6 +56,25 @@ public class SpringPluginProperties {
      */
     private Intercept intercept = new Intercept();
 
+    /**
+     * 插件调试配置
+     */
+    private Debug debug = new Debug();
+
+    /**
+     * 插件调试配置
+     *
+     * @author afěi
+     * @version 1.0.0
+     */
+    @Data
+    public static class Debug {
+
+        /**
+         * 插件资源缓存, 开启后插件资源不会刷新/删除
+         */
+        private boolean resourceCache;
+    }
 
     /**
      * 插件基础配置
