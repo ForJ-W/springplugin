@@ -26,6 +26,8 @@ import org.springplugin.core.bytecode.JavassistBytecode;
 import org.springplugin.core.classloader.PluginClassLoader;
 import org.springplugin.core.classloader.PluginClassLoaderFactory;
 import org.springplugin.core.classloader.SpringPluginClassLoader;
+import org.springplugin.core.exception.SpringPluginException;
+import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.scan.PluginScan;
 
 import java.lang.annotation.Annotation;
@@ -77,6 +79,15 @@ public abstract class AbstractPluginContext extends NamedFuture implements Plugi
     public DependencyControl versionControl(String name) {
         log.warn("use empty VersionControl");
         return DependencyControl.EMPTY;
+    }
+
+
+    @Override
+    protected void reset(String name) {
+        super.reset(name);
+        if (!unload(PluginInfoFactory.get(name))) {
+            throw new SpringPluginException(String.format("unload plugin fail, %s", name));
+        }
     }
 
     /**

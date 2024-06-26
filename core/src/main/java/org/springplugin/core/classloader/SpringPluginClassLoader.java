@@ -160,7 +160,10 @@ public class SpringPluginClassLoader extends PluginClassLoader implements SmartC
             final File lib = new File(bootInf, "lib");
             return ArrayUtils.addAll(files, ArrayUtils.addAll(lib.listFiles(), classes, lib));
         }
-
+        final File lib = new File(parentFile, "lib");
+        if (Objects.nonNull(files) && lib.exists()) {
+            return ArrayUtils.addAll(files, ArrayUtils.addAll(lib.listFiles(), lib));
+        }
         return files;
     }
 
@@ -180,13 +183,11 @@ public class SpringPluginClassLoader extends PluginClassLoader implements SmartC
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-
         // 检查当前加载器是否已加载该类
         Class<?> loadedClass = findLoadedClass(name);
         if (loadedClass != null) {
             return loadedClass;
         }
-
         for (String pluginCandidate : PLUGIN_CANDIDATES) {
             if (name.startsWith(pluginCandidate)) {
                 // 尝试用子类加载器加载插件类
@@ -196,7 +197,6 @@ public class SpringPluginClassLoader extends PluginClassLoader implements SmartC
                 }
             }
         }
-
         // 使用默认的双亲委派方式加载
         return super.loadClass(name);
     }
