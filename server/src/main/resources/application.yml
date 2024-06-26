@@ -18,6 +18,7 @@ spring:
         - /webjars/**
         - /favicon.ico
         - /error
+      identity-mode: header
   servlet:
     multipart:
       max-file-size: 200MB

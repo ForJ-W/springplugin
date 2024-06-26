@@ -113,7 +113,7 @@ public class SpringPluginSpringdocAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = SpringPluginProperties.PREFIX, name = "intercept.identity-mode", havingValue = "HEADER")
+    @ConditionalOnExpression("'${spring.plugin.intercept.identity-mode}'.toString().equalsIgnoreCase('header')")
     public OpenApiCustomizer openApiCustomizer() {
 
         return openApi -> openApi.getPaths()

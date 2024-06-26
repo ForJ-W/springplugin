@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -85,7 +86,7 @@ public class SpringPluginConfig {
      * @author afěi
      */
     @Bean
-    @ConditionalOnProperty(prefix = SpringPluginProperties.PREFIX, name = "intercept.identity-mode", havingValue = "HEADER")
+    @ConditionalOnExpression("'${spring.plugin.intercept.identity-mode}'.toString().equalsIgnoreCase('header')")
     public OpenApiCustomizer openApiCustomizer() {
 
         return openApi -> openApi.getPaths()
