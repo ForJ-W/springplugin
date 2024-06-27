@@ -21,6 +21,8 @@ package org.springplugin.core.context;
 import javassist.ClassPool;
 import javassist.LoaderClassPath;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springplugin.core.bytecode.ByteCode;
 import org.springplugin.core.bytecode.JavassistBytecode;
 import org.springplugin.core.classloader.PluginClassLoader;
@@ -48,6 +50,10 @@ public abstract class AbstractPluginContext extends NamedFuture implements Plugi
      */
     protected final Set<Class<? extends Annotation>> filterAnnotation = ConcurrentHashMap.newKeySet();
 
+    {
+        filterAnnotation.add(SpringBootApplication.class);
+        filterAnnotation.add(EnableAutoConfiguration.class);
+    }
 
     /**
      * 添加需要过滤的注解

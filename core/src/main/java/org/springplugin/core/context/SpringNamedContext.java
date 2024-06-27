@@ -42,7 +42,7 @@ import java.util.Optional;
  * @version 1.0.0
  */
 @Slf4j
-public class SpringPluginContext extends AbstractPluginContext implements PluginContext {
+public class SpringNamedContext extends AbstractPluginContext implements PluginContext {
 
     /**
      * spring 插件属性配置类
@@ -61,7 +61,7 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
      * @param pluginProperties    spring 插件属性配置类
      * @author afěi
      */
-    public SpringPluginContext(SpringPluginFactory springPluginFactory, SpringPluginProperties pluginProperties) {
+    public SpringNamedContext(SpringPluginFactory springPluginFactory, SpringPluginProperties pluginProperties) {
         this.springPluginFactory = springPluginFactory;
         this.pluginProperties = pluginProperties;
     }
@@ -108,9 +108,12 @@ public class SpringPluginContext extends AbstractPluginContext implements Plugin
                     log.error(String.format("plugin classloader close fail, %s", name), e);
                 }
             }
-            if (!FileUtils.deleteQuietly(new File(SpringPluginClassLoader.LOAD_PATH + name))) {
-                log.error("unload plugin fail, can't delete plugin file: {}", name);
-                success = false;
+            final SpringPluginProperties.Debug debug = pluginProperties.getDebug();
+            if (!debug.isResourceCache()) {
+                if (!FileUtils.deleteQuietly(new File(SpringPluginClassLoader.LOAD_PATH + name))) {
+                    log.error("unload plugin fail, can't delete plugin file: {}", name);
+                    success = false;
+                }
             }
         }
         return success;
