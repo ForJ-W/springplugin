@@ -17,33 +17,17 @@
 
 package org.springplugin.core.autoconfigure;
 
-import org.springframework.beans.factory.Aware;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
-import org.springframework.boot.autoconfigure.AutoConfigurationImportSelector;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.bind.PropertySourcesPlaceholdersResolver;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.DeferredImportSelector;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.lang.NonNull;
-import org.springframework.util.StringUtils;
-import org.springplugin.core.classloader.SpringPluginClassLoader;
-import org.springplugin.core.context.SpringPluginFactory;
-import org.springplugin.core.info.PluginInfo;
+import org.springplugin.core.scan.PluginScan;
 
-import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 插件自动配置导入选择器
@@ -53,123 +37,19 @@ import java.util.*;
  * @author afěi
  * @version 1.0.0
  */
-public class PluginAutoConfigurationImportSelector implements DeferredImportSelector,
-        EnvironmentAware, BeanFactoryAware, ResourceLoaderAware {
-
-
-    private static final String LOCATION = "META-INF/spring/%s.imports";
-
-    private static final String PROPERTY_NAME_AUTOCONFIGURE_EXCLUDE = "spring.autoconfigure.exclude";
-
-    private Environment environment;
-
-    private BeanFactory beanFactory;
-
-    private ResourceLoader resourceLoader;
-
-    private ConfigurationClassFilter configurationClassFilter;
-
-    private ClassLoader beanClassLoader;
+public class PluginAutoConfigurationImportSelector extends AutoConfigurationImportSelector {
 
     @Override
-    public void setBeanFactory(@NonNull BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
+    protected boolean isEnabled(AnnotationMetadata metadata) {
+        return true;
     }
 
     @Override
-    public void setResourceLoader(@NonNull ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
-
-    protected final Environment getEnvironment() {
-        return this.environment;
+    protected Class<?> getAnnotationClass() {
+        return PluginScan.class;
     }
 
     @Override
-    public void setEnvironment(@NonNull Environment environment) {
-        this.environment = environment;
-    }
-
-    @NonNull
-    @Override
-    public String[] selectImports(@NonNull AnnotationMetadata annotationMetadata) {
-        final PluginInfo pi = SpringPluginFactory.getPluginInfo((GenericApplicationContext) resourceLoader);
-        final String plugin = pi.name();
-        this.beanClassLoader = SpringPluginClassLoader.getInstance(plugin);
-        String location = String.format(LOCATION, AutoConfiguration.class.getName());
-        Enumeration<URL> urls = ImportCandidates.findUrlsInClasspath(this.beanClassLoader, location);
-        List<String> importCandidates = new ArrayList<>();
-        while (urls.hasMoreElements()) {
-            URL url = urls.nextElement();
-            if (url.getPath().contains(plugin)) {
-
-                final List<String> candidates = ImportCandidates.readCandidateConfigurations(url);
-                importCandidates.addAll(candidates);
-            }
-        }
-        importCandidates = removeDuplicates(importCandidates);
-        importCandidates = getConfigurationClassFilter().filter(importCandidates);
-        getExcludeAutoConfigurationsProperty().forEach(importCandidates::remove);
-        return StringUtils.toStringArray(importCandidates);
-    }
-
-    /**
-     * {@link AutoConfigurationImportSelector#removeDuplicates(List)}
-     */
-    protected final <T> List<T> removeDuplicates(List<T> list) {
-        return new ArrayList<>(new LinkedHashSet<>(list));
-    }
-
-    /**
-     * {@link AutoConfigurationImportSelector#getConfigurationClassFilter()}
-     */
-    private ConfigurationClassFilter getConfigurationClassFilter() {
-        if (this.configurationClassFilter == null) {
-            List<AutoConfigurationImportFilter> filters = getAutoConfigurationImportFilters();
-            for (AutoConfigurationImportFilter filter : filters) {
-                invokeAwareMethods(filter);
-            }
-            this.configurationClassFilter = new ConfigurationClassFilter(this.beanClassLoader, filters);
-        }
-        return this.configurationClassFilter;
-    }
-
-    /**
-     * {@link AutoConfigurationImportSelector#invokeAwareMethods(Object)}
-     */
-    private void invokeAwareMethods(Object instance) {
-        if (instance instanceof Aware) {
-            if (instance instanceof BeanClassLoaderAware beanClassLoaderAwareInstance) {
-                beanClassLoaderAwareInstance.setBeanClassLoader(this.beanClassLoader);
-            }
-            if (instance instanceof BeanFactoryAware beanFactoryAwareInstance) {
-                beanFactoryAwareInstance.setBeanFactory(this.beanFactory);
-            }
-            if (instance instanceof EnvironmentAware environmentAwareInstance) {
-                environmentAwareInstance.setEnvironment(this.environment);
-            }
-            if (instance instanceof ResourceLoaderAware resourceLoaderAwareInstance) {
-                resourceLoaderAwareInstance.setResourceLoader(this.resourceLoader);
-            }
-        }
-    }
-
-    /**
-     * {@link AutoConfigurationImportSelector#getAutoConfigurationImportFilters()}
-     */
-    protected List<AutoConfigurationImportFilter> getAutoConfigurationImportFilters() {
-        return SpringFactoriesLoader.loadFactories(AutoConfigurationImportFilter.class, this.beanClassLoader);
-    }
-
-    /**
-     * Returns the auto-configurations excluded by the
-     * {@code spring.autoconfigure.exclude} property.
-     * <p>
-     * {@link AutoConfigurationImportSelector#getExcludeAutoConfigurationsProperty()}
-     *
-     * @return excluded auto-configurations
-     * @since 2.3.2
-     */
     protected List<String> getExcludeAutoConfigurationsProperty() {
         Environment environment = getEnvironment();
         if (environment == null) {
