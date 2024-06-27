@@ -56,7 +56,7 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     /**
      * 默认指定的插件上下文配置类
      */
-    public final static Class<?> DEFAULT_CONFIG_TYPE = SpringPluginConfiguration.class;
+    public final static Class<?> DEFAULT_CONFIG_TYPE = DefaultSpringPluginConfiguration.class;
     /**
      * 属性源名称
      */
