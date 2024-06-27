@@ -51,6 +51,8 @@ public class FilePluginInfo implements PluginInfo {
             } catch (IOException e) {
                 throw new PluginException("Write file fail: '.info'", e);
             }
+        } else {
+            return new FilePluginInfo(name, fif.mainClassName());
         }
         return fif;
     }
