@@ -20,7 +20,7 @@ package mybatisplusdemo.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import mybatisplusdemo.entity.MybatisPlusDemoEntity;
-import mybatisplusdemo.mapper.MybatisPlusDemoDemoMapper;
+import mybatisplusdemo.mapper.MybatisPlusDemoMapper;
 import mybatisplusdemo.service.MybatisPlusDemoService;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
-public class MybatisPlusDemoServiceImpl extends ServiceImpl<MybatisPlusDemoDemoMapper, MybatisPlusDemoEntity> implements MybatisPlusDemoService {
+public class MybatisPlusDemoServiceImpl extends ServiceImpl<MybatisPlusDemoMapper, MybatisPlusDemoEntity> implements MybatisPlusDemoService {
 
     @Override
     public void logId() {

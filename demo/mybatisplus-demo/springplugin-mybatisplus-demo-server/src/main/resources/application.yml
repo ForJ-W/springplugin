@@ -32,7 +32,7 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
-      - com.alibaba.druid.spring.boot3.autoconfigure.DruidDataSourceAutoConfigure
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
     druid:
       stat-view-servlet:
@@ -76,4 +76,8 @@ mybatis-plus:
   #设置当查询结果值为null时，同样映射该查询字段给map
   configuration:
     call-setters-on-nulls: true
+logging:
+  level:
+    org.springframework: trace
+    org.mybatis: trace
 

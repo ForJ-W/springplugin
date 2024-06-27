@@ -24,5 +24,5 @@ import mybatisplusdemo.entity.MybatisPlusDemoEntity;
  * @author afěi
  * @version 1.0.0
  */
-public interface MybatisPlusDemoDemoMapper extends BaseMapper<MybatisPlusDemoEntity> {
+public interface MybatisPlusDemoMapper extends BaseMapper<MybatisPlusDemoEntity> {
 }
