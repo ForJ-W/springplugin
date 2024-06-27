@@ -17,6 +17,10 @@
 
 package org.springplugin.core.context;
 
+import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.core.Ordered;
+import org.springframework.lang.NonNull;
+
 /**
  * Spring 插件配置
  * <p>
@@ -29,6 +33,17 @@ package org.springplugin.core.context;
  * @author afěi
  * @version 1.0.0
  */
-public class SpringPluginConfiguration {
+public abstract class SpringPluginConfiguration implements BeanClassLoaderAware, Ordered {
 
+    protected ClassLoader beanClassLoader;
+
+    @Override
+    public void setBeanClassLoader(@NonNull ClassLoader classLoader) {
+        this.beanClassLoader = classLoader;
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
 }

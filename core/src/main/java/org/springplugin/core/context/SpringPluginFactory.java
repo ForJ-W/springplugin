@@ -217,7 +217,7 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
                 }
             }
         }
-        registry.register(PropertyPlaceholderAutoConfiguration.class, DEFAULT_CONFIG_TYPE);
+        registry.register(PropertyPlaceholderAutoConfiguration.class);
     }
 
     public AnnotationConfigApplicationContext buildContext(String name) {
