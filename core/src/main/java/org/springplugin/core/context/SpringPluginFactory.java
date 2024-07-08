@@ -21,6 +21,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.cloud.context.named.NamedContextFactory;
 import org.springframework.context.ApplicationContext;
@@ -36,13 +37,13 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.springplugin.core.context.initializer.SpringPluginContextInitializers;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.info.PluginInfo;
 import org.springplugin.core.info.PluginInfoFactory;
 import org.springplugin.core.util.SpringIocUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Spring插件工厂
@@ -77,11 +78,6 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
      * 单例实例
      */
     private static volatile SpringPluginFactory instance;
-
-    /**
-     * {@link  NamedContextFactory#applicationContextInitializers}
-     */
-    protected final Map<String, ApplicationContextInitializer<AnnotationConfigApplicationContext>> applicationContextInitializers = new ConcurrentHashMap<>();
 
     /**
      * {@link NamedContextFactory#contexts}
@@ -162,7 +158,6 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
      */
     public void destroy(String name) {
 
-        this.applicationContextInitializers.remove(name);
         Optional.ofNullable(this.contexts.remove(name)).ifPresent(AbstractApplicationContext::close);
     }
 
@@ -189,16 +184,12 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     @Override
     public AnnotationConfigApplicationContext createContext(String name) {
         name = NamedFuture.get(name);
+        final AnnotationConfigApplicationContext context = buildContext(name);
         final ConfigurableApplicationContext parent = (ConfigurableApplicationContext) getParent();
-        this.applicationContextInitializers.put(name, parent.getBean(SpringPluginChildContextInitializer.class));
-        AnnotationConfigApplicationContext context = buildContext(name);
-        if (applicationContextInitializers.get(name) != null) {
-            applicationContextInitializers.get(name).initialize(context);
-            context.refresh();
-            return context;
-        }
+        parent.getBean(SpringPluginContextInitializers.class).getInitializers().forEach(initializer -> initializer.initialize(context));
         registerBeans(name, context);
         context.refresh();
+        callRunners(context, new DefaultApplicationArguments());
         return context;
     }
 

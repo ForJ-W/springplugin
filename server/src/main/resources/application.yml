@@ -27,3 +27,4 @@ logging:
   level:
     org.springframework.web: trace
     web: trace
+    org.springplugin.core: trace
