@@ -1,0 +1,54 @@
+/*
+ * Copyright 2023 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package org.springplugin.core.context.initializer;
+
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.Ordered;
+import org.springplugin.core.classloader.SpringPluginClassLoader;
+import org.springplugin.core.context.NamedFuture;
+import org.springplugin.core.context.SpringPluginFactory;
+import org.springplugin.core.context.SpringPluginFactoryCommonSpec;
+import org.springplugin.core.env.PluginPropertySourceLocator;
+import org.springplugin.core.info.PluginInfo;
+
+/**
+ * spring插件属性源初始化器
+ *
+ * @author afěi
+ * @version 1.0.0
+ */
+public class SpringPluginPropertySourceInitializer extends AbstractSpringPluginContextInitializer implements ApplicationContextInitializer<GenericApplicationContext>, Ordered {
+
+    public static final int ORDER = SpringPluginMetaReaderInitializer.ORDER + 1;
+
+    public SpringPluginPropertySourceInitializer(SpringPluginFactory contextFactory, SpringPluginFactoryCommonSpec commonSpec) {
+        super(contextFactory, commonSpec);
+    }
+
+    @Override
+    protected void initialize(GenericApplicationContext context, PluginInfo pluginInfo) {
+        final String name = pluginInfo.name();
+        PluginPropertySourceLocator.locateConfigPropertySource(context, NamedFuture.getRootName(name), SpringPluginClassLoader.getInstance(name));
+    }
+
+    @Override
+    public int getOrder() {
+        return ORDER;
+    }
+}

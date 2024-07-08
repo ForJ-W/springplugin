@@ -23,6 +23,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springplugin.core.context.SpringPluginFactory;
+import org.springplugin.core.context.SpringPluginFactoryCommonSpec;
+import org.springplugin.core.context.initializer.*;
 import org.springplugin.core.env.PluginPropertySourceLocator;
 import org.springplugin.core.env.properties.SpringPluginProperties;
 
@@ -59,5 +61,23 @@ public class SpringPluginAutoConfiguration {
     public SpringPluginFactory pluginContextFactory() {
 
         return new SpringPluginFactory();
+    }
+
+    /**
+     * spring插件上下文初始化集
+     *
+     * @param contextFactory 上下文工厂
+     * @param commonSpec     Spring插件工厂公共规范
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @SuppressWarnings("unchecked")
+    public SpringPluginContextInitializers springPluginContextInitializers(SpringPluginFactory contextFactory,
+                                                                           SpringPluginFactoryCommonSpec commonSpec) {
+        return new SpringPluginContextInitializers(contextFactory, commonSpec,
+                SpringPluginMetaReaderInitializer.class,
+                SpringPluginPropertySourceInitializer.class,
+                SpringPluginBeanRegisterInitializer.class,
+                SpringPluginWebMvcConfigureInitializer.class);
     }
 }

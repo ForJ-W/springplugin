@@ -23,3 +23,8 @@ spring:
     multipart:
       max-file-size: 200MB
       max-request-size: 200MB
+logging:
+  level:
+    org.springframework.web: trace
+    web: trace
+    org.springplugin.core: trace

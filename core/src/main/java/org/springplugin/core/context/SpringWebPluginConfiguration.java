@@ -38,6 +38,7 @@ import org.springframework.web.servlet.resource.ResourceUrlProvider;
 public class SpringWebPluginConfiguration extends SpringPluginConfiguration {
 
 
+
     /**
      * 请求映射处理器
      * <p>
@@ -75,4 +76,22 @@ public class SpringWebPluginConfiguration extends SpringPluginConfiguration {
 
         return enableWebMvcConfiguration.requestMappingHandlerAdapter(contentNegotiationManager, conversionService, validator);
     }
+
+//    /**
+//     * Return a handler mapping ordered at Integer.MAX_VALUE-1 with mapped
+//     * resource handlers. To configure resource handling, override
+//     * {@link org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport#addResourceHandlers}.
+//     */
+//    @Bean
+//    @Nullable
+//    @ConditionalOnMissingBean(search = SearchStrategy.CURRENT)
+//    public HandlerMapping resourceHandlerMapping(
+//            ServletContext servletContext,
+//            WebMvcAutoConfiguration.EnableWebMvcConfiguration enableWebMvcConfiguration,
+//            @Qualifier("mvcContentNegotiationManager") ContentNegotiationManager contentNegotiationManager,
+//            @Qualifier("mvcConversionService") FormattingConversionService conversionService,
+//            @Qualifier("mvcResourceUrlProvider") ResourceUrlProvider resourceUrlProvider) {
+//
+//        return enableWebMvcConfiguration.resourceHandlerMapping(contentNegotiationManager, conversionService, resourceUrlProvider);
+//    }
 }

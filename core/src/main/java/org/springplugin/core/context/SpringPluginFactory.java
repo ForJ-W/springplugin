@@ -31,6 +31,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ReflectionUtils;
+import org.springplugin.core.context.initializer.SpringPluginContextInitializers;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.info.PluginInfo;
 import org.springplugin.core.info.PluginInfoFactory;
@@ -73,11 +74,6 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     private static volatile SpringPluginFactory instance;
 
     /**
-     * {@link  NamedContextFactory#applicationContextInitializers}
-     */
-    protected final Map<String, ApplicationContextInitializer<GenericApplicationContext>> applicationContextInitializers;
-
-    /**
      * {@link NamedContextFactory#contexts}
      */
     protected final Map<String, GenericApplicationContext> contexts;
@@ -90,18 +86,8 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     @SuppressWarnings("unchecked")
     public SpringPluginFactory() {
         super(DEFAULT_CONFIG_TYPE, PROPERTY_SOURCE_NAME, PROPERTY_NAME);
-        // 反射获取私有核心属性 上下文初始化器和上下文容器
-        final String applicationContextInitializersErrorMessage = "Can not initialize applicationContextInitializers";
-        this.applicationContextInitializers = Optional.ofNullable(ReflectionUtils.findField(NamedContextFactory.class, "applicationContextInitializers", Map.class))
-                .map(f -> {
-                    f.setAccessible(true);
-                    try {
-                        return (Map<String, ApplicationContextInitializer<GenericApplicationContext>>) f.get(this);
-                    } catch (IllegalAccessException e) {
-                        throw new SpringPluginException(applicationContextInitializersErrorMessage, e);
-                    }
-                }).orElseThrow(() -> new SpringPluginException(applicationContextInitializersErrorMessage));
-        final String contextsErrorMessage = "Can not initialize applicationContextInitializers";
+        // 反射获取上下文容器
+        final String contextsErrorMessage = "Can not initialize contexts";
         this.contexts = Optional.ofNullable(ReflectionUtils.findField(NamedContextFactory.class, "contexts", Map.class))
                 .map(f -> {
                     f.setAccessible(true);
@@ -152,7 +138,6 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
      */
     public void destroy(String name) {
 
-        this.applicationContextInitializers.remove(name);
         Optional.ofNullable(this.contexts.remove(name)).ifPresent(AbstractApplicationContext::close);
     }
 
@@ -236,9 +221,10 @@ public class SpringPluginFactory extends NamedContextFactory<SpringPluginFactory
     @Override
     public GenericApplicationContext buildContext(String name) {
         name = NamedFuture.get(name);
+        final GenericApplicationContext context = super.buildContext(name);
         final ConfigurableApplicationContext parent = (ConfigurableApplicationContext) getParent();
-        this.applicationContextInitializers.put(name, parent.getBean(SpringPluginChildContextInitializer.class));
-        return super.buildContext(name);
+        parent.getBean(SpringPluginContextInitializers.class).getInitializers().forEach(initializer -> initializer.initialize(context));
+        return context;
     }
 
     @Override

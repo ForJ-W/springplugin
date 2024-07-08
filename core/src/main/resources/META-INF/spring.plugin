@@ -5,5 +5,6 @@ org.springframework.boot.autoconfigure.transaction
 org.springframework.boot.autoconfigure.sql
 org.springframework.boot.autoconfigure.flyway
 org.springframework.boot.jdbc
-jakarta.servlet.Servlet
-org.springframework.web.context.ConfigurableWebApplicationContext
+org.springframework.boot.autoconfigure.amqp
+org.springframework.boot.autoconfigure.mongo
+org.springframework.boot.autoconfigure.quartz

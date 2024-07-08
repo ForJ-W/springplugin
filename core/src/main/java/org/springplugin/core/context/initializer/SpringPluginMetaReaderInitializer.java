@@ -15,9 +15,8 @@
  *
  */
 
-package org.springplugin.core.context;
+package org.springplugin.core.context.initializer;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanClassLoaderAware;
@@ -45,47 +44,35 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.lang.NonNull;
-import org.springplugin.core.classloader.PluginClassLoader;
-import org.springplugin.core.classloader.SpringPluginClassLoader;
-import org.springplugin.core.env.PluginPropertySourceLocator;
-import org.springplugin.core.exception.SpringPluginException;
+import org.springplugin.core.context.SpringPluginFactory;
+import org.springplugin.core.context.SpringPluginFactoryCommonSpec;
 import org.springplugin.core.info.PluginInfo;
-import org.springplugin.core.util.SpringAwareUtils;
 
-import java.util.Collections;
 import java.util.function.Supplier;
 
 /**
- * spring插件子上下文初始化器
+ * spring插件元数据读取初始化器
  *
  * @author afěi
  * @version 1.0.0
  */
-@RequiredArgsConstructor
-public class SpringPluginChildContextInitializer implements ApplicationContextInitializer<GenericApplicationContext> {
+public class SpringPluginMetaReaderInitializer extends AbstractSpringPluginContextInitializer implements ApplicationContextInitializer<GenericApplicationContext>, Ordered {
 
     public static final String METADATA_READER_BEAN_NAME = "org.springframework.boot.autoconfigure.pluginCachingMetadataReaderFactory";
+    public static final int ORDER = Ordered.HIGHEST_PRECEDENCE;
 
-    /**
-     * Spring插件工厂
-     */
-    private final SpringPluginFactory contextFactory;
-
-    /**
-     * Spring插件工厂公共规范
-     */
-    private final SpringPluginFactoryCommonSpec commonSpec;
+    public SpringPluginMetaReaderInitializer(SpringPluginFactory contextFactory, SpringPluginFactoryCommonSpec commonSpec) {
+        super(contextFactory, commonSpec);
+    }
 
     @Override
-    public void initialize(@NonNull GenericApplicationContext context) {
-
-        final PluginInfo pi = SpringPluginFactory.getPluginInfo(context);
-        final String name = pi.name();
-        contextFactory.setConfigurations(Collections.singletonList(new SpringPluginFactorySpec(name, commonSpec.getConfiguration())));
-        PluginPropertySourceLocator.locateConfigPropertySource(context, NamedFuture.getRootName(name), SpringPluginClassLoader.getInstance(name));
+    protected void initialize(GenericApplicationContext context, PluginInfo pluginInfo) {
         beanFactoryPostProcessor(context);
-        registerBean(context, pi);
-        PluginContextCleaner.register(context, SpringAwareUtils::removeChildAware);
+    }
+
+    @Override
+    public int getOrder() {
+        return ORDER;
     }
 
     /**
@@ -98,29 +85,6 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
         BeanFactoryPostProcessor postProcessor = new CachingMetadataReaderFactoryPostProcessor(context);
         context.addBeanFactoryPostProcessor(postProcessor);
     }
-
-    /**
-     * 注册插件子上下文所需要的bean
-     *
-     * @param context 通用的应用上下文
-     * @param info    插件信息
-     * @author afěi
-     */
-    private void registerBean(GenericApplicationContext context, PluginInfo info) {
-        final String name = info.name();
-        final Class<?> mainClass;
-        try {
-            mainClass = info.mainClass();
-        } catch (ClassNotFoundException e) {
-            throw new SpringPluginException(String.format("Can not find main class, %s", name), e);
-        }
-        final PluginClassLoader classLoader = SpringPluginClassLoader.getInstance(name);
-        context.setClassLoader(classLoader);
-        context.getBeanFactory().setBeanClassLoader(classLoader);
-        context.registerBean(mainClass.getName(), mainClass);
-        this.contextFactory.registerBeans(name, context);
-    }
-
 
     /**
      * {@link BeanDefinitionRegistryPostProcessor} to register the
@@ -143,11 +107,11 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
         }
 
         @Override
-        public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
         }
 
         @Override
-        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+        public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry registry) throws BeansException {
             register(registry);
             configureConfigurationClassPostProcessor(registry);
         }
@@ -165,7 +129,7 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
             try {
                 configureConfigurationClassPostProcessor(
                         registry.getBeanDefinition(AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
-            } catch (NoSuchBeanDefinitionException ex) {
+            } catch (NoSuchBeanDefinitionException ignored) {
             }
         }
 
@@ -234,7 +198,7 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
         private ConcurrentReferenceCachingMetadataReaderFactory metadataReaderFactory;
 
         @Override
-        public void setBeanClassLoader(ClassLoader classLoader) {
+        public void setBeanClassLoader(@NonNull ClassLoader classLoader) {
             this.metadataReaderFactory = new ConcurrentReferenceCachingMetadataReaderFactory(classLoader);
         }
 
@@ -254,7 +218,7 @@ public class SpringPluginChildContextInitializer implements ApplicationContextIn
         }
 
         @Override
-        public void onApplicationEvent(ContextRefreshedEvent event) {
+        public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
             this.metadataReaderFactory.clearCache();
         }
     }

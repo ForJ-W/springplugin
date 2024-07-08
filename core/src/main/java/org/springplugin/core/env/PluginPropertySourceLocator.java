@@ -149,10 +149,11 @@ public class PluginPropertySourceLocator implements PropertySourceLocator {
 
                     final Map<String, Object> source = (Map<String, Object>) propertySource.getSource();
                     addFirstPropertySource(composite, new PluginPropertySource(pluginName, source));
+                    log.info("Plugin config loaded: plugin name: {}|{}", pluginName, resource);
                 }
             }
         } catch (Exception e) {
-            log.info("Can not load plugin config: {}:{}, {}", pluginName, resource.getFilename(), e.getMessage());
+            log.warn("Can not load plugin config: {}:{}, {}", pluginName, resource.getFilename(), e.getMessage());
         }
     }
 

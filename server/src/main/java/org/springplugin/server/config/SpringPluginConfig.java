@@ -61,19 +61,6 @@ public class SpringPluginConfig {
     }
 
     /**
-     * 插件子上下文初始化器
-     *
-     * @param springPluginFactory           Spring插件工厂
-     * @param springPluginFactoryCommonSpec Spring插件工厂公共规范
-     * @author afěi
-     */
-    @Bean
-    public SpringPluginChildContextInitializer springPluginChildContextInitializer(SpringPluginFactory springPluginFactory,
-                                                                                   SpringPluginFactoryCommonSpec springPluginFactoryCommonSpec) {
-        return new SpringPluginChildContextInitializer(springPluginFactory, springPluginFactoryCommonSpec);
-    }
-
-    /**
      * open api定制器
      * <p>
      * 添加插件元信息头

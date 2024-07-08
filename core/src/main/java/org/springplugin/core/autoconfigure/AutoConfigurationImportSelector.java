@@ -16,29 +16,10 @@
 
 package org.springplugin.core.autoconfigure;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.Aware;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.context.annotation.ImportCandidates;
@@ -59,7 +40,13 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import org.springplugin.core.context.SpringPluginChildContextInitializer;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static org.springplugin.core.context.initializer.SpringPluginMetaReaderInitializer.METADATA_READER_BEAN_NAME;
 
 /**
  * {@link DeferredImportSelector} to handle {@link EnableAutoConfiguration
@@ -471,7 +458,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 		private MetadataReaderFactory getMetadataReaderFactory() {
 			try {
-				return this.beanFactory.getBean(SpringPluginChildContextInitializer.METADATA_READER_BEAN_NAME,
+				return this.beanFactory.getBean(METADATA_READER_BEAN_NAME,
 						MetadataReaderFactory.class);
 			}
 			catch (NoSuchBeanDefinitionException ex) {
