@@ -22,11 +22,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springplugin.core.context.SpringPluginFactory;
-import org.springplugin.core.context.SpringPluginFactoryCommonSpec;
-import org.springplugin.core.context.initializer.*;
-import org.springplugin.core.env.PluginPropertySourceLocator;
-import org.springplugin.core.env.properties.SpringPluginProperties;
+import org.springplugin.core.app.configuration.SpringWebAppConfiguration;
+import org.springplugin.core.app.context.SpringAppContextFactory;
+import org.springplugin.core.app.context.SpringAppContextFactorySpecification;
+import org.springplugin.core.app.context.initializer.SpringAppBeanRegisterInitializer;
+import org.springplugin.core.app.context.initializer.SpringAppContextInitializers;
+import org.springplugin.core.app.context.initializer.SpringAppMetaReaderInitializer;
+import org.springplugin.core.app.context.initializer.SpringAppWebMvcConfigureInitializer;
+import org.springplugin.core.server.SpringPluginProperties;
+
+import static org.springplugin.core.app.context.AppContextFactory.Specification.DEFAULT_SPECIFICATION;
 
 /**
  * 插件配置类
@@ -38,46 +43,31 @@ import org.springplugin.core.env.properties.SpringPluginProperties;
 @EnableConfigurationProperties(SpringPluginProperties.class)
 public class SpringPluginAutoConfiguration {
 
-
     /**
-     * 插件属性源定位器
+     * Spring插件应用工厂
      *
      * @author afěi
      */
     @Bean
     @ConditionalOnMissingBean
-    public PluginPropertySourceLocator pluginPropertySourceLocator(SpringPluginProperties pluginProps) {
-
-        return new PluginPropertySourceLocator(pluginProps);
+    public SpringAppContextFactory appContextFactory() {
+        return new SpringAppContextFactory()
+                .specifications(new SpringAppContextFactorySpecification(DEFAULT_SPECIFICATION,
+                        SpringWebAppConfiguration.class));
     }
 
     /**
-     * Spring插件工厂
+     * spring插件应用上下文初始化集
      *
-     * @author afěi
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringPluginFactory pluginContextFactory() {
-
-        return new SpringPluginFactory();
-    }
-
-    /**
-     * spring插件上下文初始化集
-     *
-     * @param contextFactory 上下文工厂
-     * @param commonSpec     Spring插件工厂公共规范
+     * @param factory 上下文工厂
      */
     @Bean
     @ConditionalOnMissingBean
     @SuppressWarnings("unchecked")
-    public SpringPluginContextInitializers springPluginContextInitializers(SpringPluginFactory contextFactory,
-                                                                           SpringPluginFactoryCommonSpec commonSpec) {
-        return new SpringPluginContextInitializers(contextFactory, commonSpec,
-                SpringPluginMetaReaderInitializer.class,
-                SpringPluginPropertySourceInitializer.class,
-                SpringPluginBeanRegisterInitializer.class,
-                SpringPluginWebMvcConfigureInitializer.class);
+    public SpringAppContextInitializers springPluginContextInitializers(SpringAppContextFactory factory) {
+        return new SpringAppContextInitializers(factory,
+                SpringAppMetaReaderInitializer.class,
+                SpringAppBeanRegisterInitializer.class,
+                SpringAppWebMvcConfigureInitializer.class);
     }
 }

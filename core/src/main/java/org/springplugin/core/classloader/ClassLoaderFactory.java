@@ -18,6 +18,7 @@
 package org.springplugin.core.classloader;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * 类加载器工厂
@@ -62,7 +63,7 @@ public interface ClassLoaderFactory<T extends ClassLoader> {
      * @return 类加载器
      * @author afěi
      */
-    @NonNull
+    @Nullable
     T getClassLoader(String name);
 
     /**

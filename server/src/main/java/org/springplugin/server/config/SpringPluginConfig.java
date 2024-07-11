@@ -24,9 +24,11 @@ import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springplugin.core.app.context.SpringAppContextFactory;
 import org.springplugin.core.contant.PluginConstant;
-import org.springplugin.core.context.*;
-import org.springplugin.core.env.properties.SpringPluginProperties;
+import org.springplugin.core.server.SpringPluginProperties;
+import org.springplugin.core.server.context.AppServerContext;
+import org.springplugin.core.server.context.SpringAppServerContext;
 
 /**
  * 插件配置
@@ -39,25 +41,14 @@ import org.springplugin.core.env.properties.SpringPluginProperties;
 public class SpringPluginConfig {
 
     /**
-     * 插件上下文
+     * 插件应用上下文
      *
      * @author afěi
      */
     @Bean
-    public PluginContext pluginContext(SpringPluginFactory springPluginFactory, SpringPluginProperties configProps) {
+    public AppServerContext serverContext(SpringAppContextFactory factory, SpringPluginProperties properties) {
 
-        return new SpringNamedContext(springPluginFactory, configProps);
-    }
-
-    /**
-     * Spring插件工厂公共规范
-     *
-     * @author afěi
-     */
-    @Bean
-    public SpringPluginFactoryCommonSpec springPluginFactoryCommonSpec() {
-
-        return new SpringPluginFactoryCommonSpec(SpringWebPluginConfiguration.class);
+        return new SpringAppServerContext(factory, properties);
     }
 
     /**

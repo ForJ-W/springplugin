@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.springplugin.core.context.initializer.SpringPluginMetaReaderInitializer.METADATA_READER_BEAN_NAME;
+import static org.springplugin.core.app.context.initializer.SpringAppMetaReaderInitializer.METADATA_READER_BEAN_NAME;
 
 /**
  * {@link DeferredImportSelector} to handle {@link EnableAutoConfiguration

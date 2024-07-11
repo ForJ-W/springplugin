@@ -18,29 +18,27 @@
 package appdemo.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springplugin.core.context.DependencyControl;
-import org.springplugin.core.context.PluginContext;
-import org.springplugin.core.context.SpringPluginFactory;
-import org.springplugin.core.info.PluginInfoFactory;
+import org.springplugin.core.app.DependencyControl;
+import org.springplugin.core.app.context.SpringAppContextFactory;
+import org.springplugin.core.info.DefaultAppInfo;
+import org.springplugin.core.server.context.AppServerContext;
 
 /**
  * @author afěi
  * @version 1.0.0
  */
 @Component
-@Lazy
 @RequiredArgsConstructor
 public class AppDemoDependencyControl implements DependencyControl {
 
-    final SpringPluginFactory pcf;
-    final PluginContext pc;
+    final SpringAppContextFactory factory;
+    final AppServerContext serverContext;
 
     @Override
     public void control() {
-        if (!pcf.hasContext("mybatisplusdemo")) {
-            pc.load(PluginInfoFactory.get("mybatisplusdemo"));
+        if (!factory.hasContext("mybatisplusdemo")) {
+            serverContext.load(DefaultAppInfo.of("mybatisplusdemo"));
         }
     }
 

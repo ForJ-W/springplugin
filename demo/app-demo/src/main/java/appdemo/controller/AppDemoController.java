@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import mybatisplusdemo.service.MybatisPlusDemoService;
 import org.springframework.web.bind.annotation.*;
-import org.springplugin.core.util.PluginBeanUtils;
+import org.springplugin.core.util.AppBeanUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -59,7 +59,7 @@ public class AppDemoController {
      */
     static <T> T getMybatisPlusDemoBean(Class<T> cls) {
 
-        return PluginBeanUtils.getBean("mybatisplusdemo", cls);
+        return AppBeanUtils.getBean("mybatisplusdemo", cls);
     }
 
     @GetMapping("list")
