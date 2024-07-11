@@ -35,10 +35,9 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springplugin.core.app.context.SpringAppContextFactory;
 import org.springplugin.core.contant.PluginConstant;
-import org.springplugin.core.context.SpringPluginFactory;
-import org.springplugin.core.springdoc.SpringDocBeanPostProcessor;
-import org.springplugin.core.springdoc.SpringPluginWebMvcProvider;
+import org.springplugin.core.mvc.SpringPluginWebMvcProvider;
 
 import java.util.Set;
 
@@ -51,13 +50,13 @@ import java.util.Set;
 @Configuration
 @AutoConfigureAfter(SpringPluginAutoConfiguration.class)
 @ConditionalOnClass(SpringWebMvcProvider.class)
-@ConditionalOnBean(SpringPluginFactory.class)
+@ConditionalOnBean(SpringAppContextFactory.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @RequiredArgsConstructor
 @AutoConfigureBefore(SpringDocWebMvcConfiguration.class)
 public class SpringPluginSpringdocAutoConfiguration {
 
-    private final SpringPluginFactory factory;
+    private final SpringAppContextFactory factory;
 
 
     /**
@@ -71,18 +70,6 @@ public class SpringPluginSpringdocAutoConfiguration {
         return new SpringPluginWebMvcProvider();
     }
 
-
-    /**
-     * spring doc bean后置处理器
-     *
-     * @author afěi
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringDocBeanPostProcessor springDocBeanPostProcessor() {
-        return new SpringDocBeanPostProcessor();
-    }
-
     /**
      * 定制open api构建
      *
@@ -93,7 +80,7 @@ public class SpringPluginSpringdocAutoConfiguration {
     public OpenApiBuilderCustomizer openApiBuilderCustomizer() {
         return builder -> {
             final Set<String> contextNames = factory.getContextNames();
-            // 获取所有插件上下文中的相关注解的bean
+            // 获取所有插件应用上下文中的相关注解的bean
             for (String contextName : contextNames) {
                 final GenericApplicationContext context = factory.getContext(contextName);
                 builder.addMappings(context.getBeansWithAnnotation(RestController.class));

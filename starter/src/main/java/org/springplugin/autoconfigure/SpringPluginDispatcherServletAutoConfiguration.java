@@ -36,9 +36,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springplugin.core.context.SpringPluginFactory;
-import org.springplugin.core.env.properties.SpringPluginProperties;
-import org.springplugin.core.mvc.PluginDispatcherServlet;
+import org.springplugin.core.app.context.SpringAppContextFactory;
+import org.springplugin.core.mvc.SpringPluginDispatcherServlet;
+import org.springplugin.core.server.SpringPluginProperties;
 
 import javax.servlet.ServletRegistration;
 import java.util.Arrays;
@@ -77,9 +77,9 @@ public class SpringPluginDispatcherServletAutoConfiguration extends DispatcherSe
     public static class PluginDispatcherServletConfiguration extends DispatcherServletConfiguration {
 
         /**
-         * Spring插件工厂
+         * Spring插件应用工厂
          */
-        private final SpringPluginFactory factory;
+        private final SpringAppContextFactory factory;
 
         /**
          * 插件属性配置类
@@ -95,7 +95,7 @@ public class SpringPluginDispatcherServletAutoConfiguration extends DispatcherSe
         @Bean(name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
         @Override
         public DispatcherServlet dispatcherServlet(WebMvcProperties webMvcProperties) {
-            DispatcherServlet dispatcherServlet = new PluginDispatcherServlet(factory, pluginProps);
+            DispatcherServlet dispatcherServlet = new SpringPluginDispatcherServlet(factory, pluginProps);
             dispatcherServlet.setDispatchOptionsRequest(webMvcProperties.isDispatchOptionsRequest());
             dispatcherServlet.setDispatchTraceRequest(webMvcProperties.isDispatchTraceRequest());
             dispatcherServlet.setThrowExceptionIfNoHandlerFound(webMvcProperties.isThrowExceptionIfNoHandlerFound());

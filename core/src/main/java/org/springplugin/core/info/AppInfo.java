@@ -15,33 +15,49 @@
  *
  */
 
-package org.springplugin.core.contant;
+package org.springplugin.core.info;
+
+
+import org.springplugin.core.classloader.SpringAppClassLoader;
 
 /**
- * 插件常量
+ * 插件应用信息
  *
  * @author afěi
  * @version 1.0.0
  */
-public interface PluginConstant {
+public interface AppInfo {
 
     /**
-     * 插件元信息头
+     * 默认主类名
      */
-    String META_HEADER = "app-meta";
+    String DEFAULT_MAIN_CLASS_NAME = "Main";
 
     /**
-     * classes目录名
+     * 获取 插件名称
+     *
+     * @return 插件名称
+     * @author afěi
      */
-    String CLASSES = "classes";
+    String name();
 
     /**
-     * classes目录路径
+     * 主类名
+     *
+     * @return 主类名
+     * @author afěi
      */
-    String CLASSES_PATH = "/classes/";
+    String mainClassName();
 
     /**
-     * 主类文件名
+     * 获取主类
+     *
+     * @return 主类
+     * @throws ClassNotFoundException 类未找到异常
+     * @author afěi
      */
-    String MAIN_CLASS_NAME = "Main.class";
+    default Class<?> mainClass() throws ClassNotFoundException {
+
+        return SpringAppClassLoader.getInstance(name()).forName(name() + "." + DEFAULT_MAIN_CLASS_NAME);
+    }
 }

@@ -15,23 +15,35 @@
  *
  */
 
-package appdemo;
-
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springplugin.core.scan.AppComponentScan;
+package org.springplugin.core.app.context;
 
 /**
+ * Spring插件应用工厂规范
+ *
  * @author afěi
  * @version 1.0.0
  */
-@SpringBootApplication(scanBasePackages = {"appdemo", "mybatisplusdemo"})
-@MapperScan({"mybatisplusdemo.mapper", "appdemo.mapper"})
-@AppComponentScan
-public class Main {
-    public static void main(String[] args) {
+public class SpringAppContextFactorySpecification implements AppContextFactory.Specification {
 
-        SpringApplication.run(Main.class, args);
+    private final String name;
+
+    /**
+     * 插件配置类数组
+     */
+    private final Class<?>[] configuration;
+
+    public SpringAppContextFactorySpecification(String name, Class<?>... configuration) {
+        this.name = name;
+        this.configuration = configuration;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public Class<?>[] getConfigurations() {
+        return this.configuration;
     }
 }

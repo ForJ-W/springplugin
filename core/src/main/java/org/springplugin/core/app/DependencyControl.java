@@ -15,33 +15,53 @@
  *
  */
 
-package org.springplugin.core.contant;
+package org.springplugin.core.app;
+
+import org.springframework.beans.factory.InitializingBean;
 
 /**
- * 插件常量
+ * 依赖控制扩展接口
  *
  * @author afěi
  * @version 1.0.0
  */
-public interface PluginConstant {
+public interface DependencyControl extends InitializingBean {
 
     /**
-     * 插件元信息头
+     * 空依赖控制
      */
-    String META_HEADER = "app-meta";
+    DependencyControl EMPTY = new DependencyControl() {
+
+        @Override
+        public void control() {
+        }
+
+        @Override
+        public void upgrade() {
+        }
+    };
 
     /**
-     * classes目录名
+     * 初始化时检查依赖控制
+     *
+     * @author afěi
      */
-    String CLASSES = "classes";
+    @Override
+    default void afterPropertiesSet() {
+        control();
+    }
 
     /**
-     * classes目录路径
+     * 依赖控制
+     *
+     * @author afěi
      */
-    String CLASSES_PATH = "/classes/";
+    void control();
 
     /**
-     * 主类文件名
+     * 版本升级
+     *
+     * @author afěi
      */
-    String MAIN_CLASS_NAME = "Main.class";
+    void upgrade();
 }
