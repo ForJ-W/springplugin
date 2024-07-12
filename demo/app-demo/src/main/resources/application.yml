@@ -38,11 +38,6 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
   datasource:
-    druid:
-      stat-view-servlet:
-        enabled: true
-        allow: ""
-        reset-enable: true
     dynamic:
       lazy: true
       primary: ${server.mysql.database}
@@ -70,11 +65,10 @@ spring:
           url: jdbc:mysql://${server.mysql.ip}:${server.mysql.port}/${server.mysql.database}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
           username: ${server.mysql.username}
           password: ${server.mysql.password}
-  data:
-    redis:
-      host: ${server.redis.ip}
-      port: ${server.redis.port}
-      password: ${server.redis.password}
+  redis:
+    host: ${server.redis.ip}
+    port: ${server.redis.port}
+    password: ${server.redis.password}
 
 # mybatis配置
 mybatis-plus:

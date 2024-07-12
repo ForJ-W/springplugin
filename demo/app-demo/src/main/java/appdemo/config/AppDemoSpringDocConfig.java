@@ -47,7 +47,7 @@ public class AppDemoSpringDocConfig {
      * @param swaggerUiConfigParameters swagger ui配置参数
      * @author afěi
      */
-    @Bean
+//    @Bean
     public OpenAPI openApi(SwaggerUiConfigParameters swaggerUiConfigParameters) {
 
         swaggerUiConfigParameters.addGroup(appName);

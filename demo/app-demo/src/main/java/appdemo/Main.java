@@ -19,7 +19,6 @@ package appdemo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springplugin.core.scan.AppComponentScan;
 
 /**
  * @author afěi
@@ -27,7 +26,6 @@ import org.springplugin.core.scan.AppComponentScan;
  */
 @SpringBootApplication(scanBasePackages = {"appdemo", "mybatisplusdemo"})
 @MapperScan({"mybatisplusdemo.mapper", "appdemo.mapper"})
-@AppComponentScan
 public class Main {
     public static void main(String[] args) {
 

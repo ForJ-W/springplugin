@@ -34,11 +34,6 @@ spring:
       - org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
       - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
-    druid:
-      stat-view-servlet:
-        enabled: true
-        allow: ""
-        reset-enable: true
     dynamic:
       lazy: true
       primary: ${server.mysql.database}
