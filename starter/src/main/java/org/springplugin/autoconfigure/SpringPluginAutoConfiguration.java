@@ -29,6 +29,8 @@ import org.springplugin.core.app.context.initializer.SpringAppContextInitializer
 import org.springplugin.core.app.context.initializer.SpringAppMetaReaderInitializer;
 import org.springplugin.core.app.context.initializer.SpringAppWebMvcConfigureInitializer;
 import org.springplugin.core.server.SpringPluginProperties;
+import org.springplugin.core.server.context.AppServerContext;
+import org.springplugin.core.server.context.SpringAppServerContext;
 
 import static org.springplugin.core.app.context.AppContextFactory.Specification.DEFAULT_SPECIFICATION;
 
@@ -53,6 +55,18 @@ public class SpringPluginAutoConfiguration {
         return new SpringAppContextFactory()
                 .specifications(new SpringAppContextFactorySpecification(DEFAULT_SPECIFICATION,
                         SpringWebAppConfiguration.class));
+    }
+
+    /**
+     * 插件应用服务上下文
+     *
+     * @author afěi
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public AppServerContext serverContext(SpringAppContextFactory factory, SpringPluginProperties properties) {
+
+        return new SpringAppServerContext(factory, properties);
     }
 
     /**
