@@ -16,7 +16,7 @@
 
 package appdemo.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springplugin.core.app.DependencyControl;
 import org.springplugin.core.app.context.SpringAppContextFactory;
@@ -28,11 +28,18 @@ import org.springplugin.core.server.context.AppServerContext;
  * @version 1.0.0
  */
 @Component
-@RequiredArgsConstructor
 public class AppDemoDependencyControl implements DependencyControl {
 
     final SpringAppContextFactory factory;
     final AppServerContext serverContext;
+
+
+    public AppDemoDependencyControl(@Autowired(required = false) SpringAppContextFactory factory,
+                                    @Autowired(required = false) AppServerContext serverContext) {
+        this.factory = factory;
+        this.serverContext = serverContext;
+    }
+
 
     @Override
     public void control() {

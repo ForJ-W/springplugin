@@ -17,6 +17,7 @@
 package org.springplugin.core.app;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springplugin.core.classloader.AppClassLoader;
 
 /**
  * 依赖控制扩展接口
@@ -47,7 +48,9 @@ public interface DependencyControl extends InitializingBean {
      */
     @Override
     default void afterPropertiesSet() {
-        control();
+        if (Thread.currentThread().getContextClassLoader() instanceof AppClassLoader) {
+            control();
+        }
     }
 
     /**
