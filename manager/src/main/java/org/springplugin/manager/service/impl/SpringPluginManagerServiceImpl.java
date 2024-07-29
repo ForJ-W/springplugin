@@ -15,15 +15,13 @@
  *
  */
 
-package org.springplugin.server.controller;
+package org.springplugin.manager.service.impl;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springplugin.core.classloader.SpringAppClassLoader;
 import org.springplugin.core.exception.SpringPluginException;
@@ -32,6 +30,7 @@ import org.springplugin.core.info.FileAppInfo;
 import org.springplugin.core.server.SpringPluginProperties;
 import org.springplugin.core.server.context.AppServerContext;
 import org.springplugin.core.util.AssertUtils;
+import org.springplugin.manager.service.SpringPluginManagerService;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,29 +38,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
+ * 插件管理service实现
+ *
  * @author afěi
  * @version 1.0.0
  */
-@Tag(name = "pm")
 @Slf4j
-@RestController
-@RequestMapping("pm")
+@Service
 @RequiredArgsConstructor
-public class SpringPluginManagerController {
+public class SpringPluginManagerServiceImpl implements SpringPluginManagerService {
 
     private final AppServerContext serverContext;
     private final SpringPluginProperties springPluginProps;
 
-    /**
-     * 加载插件
-     *
-     * @param file 插件文件
-     * @return 加载结果信息
-     * @throws IOException 插件文件io异常
-     * @author afěi
-     */
-    @PostMapping(value = "load", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String load(@RequestPart("file") MultipartFile file, @RequestParam(name = "mainClass", required = false) String mainClass) throws IOException {
+
+    @Override
+    public String load(MultipartFile file, String mainClass) throws IOException {
 
         AssertUtils.nonNull(file, new SpringPluginException("file must not be null"));
         final String originalFilename = file.getOriginalFilename();
@@ -100,14 +92,8 @@ public class SpringPluginManagerController {
         return successMessage;
     }
 
-    /**
-     * 卸载插件
-     *
-     * @param name 插件名称
-     * @return 卸载结果信息
-     */
-    @PostMapping("unload")
-    public String unload(@RequestParam("name") String name) {
+    @Override
+    public String unload(String name) {
         try {
             serverContext.unload(AppInfoFactory.get(name));
         } catch (Exception e) {

@@ -15,26 +15,21 @@
  *
  */
 
-package org.springplugin.server;
+package org.springplugin.manager;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springplugin.server.init.ServerInitializer;
 
 /**
+ * 插件管理应用
+ *
  * @author afěi
  * @version 1.0.0
  */
-@Slf4j
 @SpringBootApplication
-@RequiredArgsConstructor
-public class SpringPluginServerApp {
+public class ManagerApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(SpringPluginServerApp.class, args);
-        context.getBean(ServerInitializer.class).init();
+        SpringApplication.run(ManagerApplication.class, args);
     }
 }

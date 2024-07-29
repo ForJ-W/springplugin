@@ -116,7 +116,6 @@ public class SpringAppServerContext extends AbstractAppServerContext implements 
             AppInfoFactory.set(name, info);
             processAnnotationOnClass(info.mainClass(), initContextClassLoader(name));
             factory.initContext(name);
-            log.info("load spring plugin success, {}", name);
         } catch (Throwable e) {
             log.error(String.format("load spring plugin fail, %s", name), e);
             unload(info);

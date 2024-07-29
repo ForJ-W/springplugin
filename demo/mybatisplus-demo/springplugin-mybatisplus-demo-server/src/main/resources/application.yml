@@ -1,6 +1,6 @@
 # datasource配置
 server:
-  common-ip: localhost
+  common-ip: 192.168.1.241
   port: 8103
   mysql:
     database: plugin_demo

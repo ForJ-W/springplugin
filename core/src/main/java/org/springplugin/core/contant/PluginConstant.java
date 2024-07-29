@@ -31,6 +31,31 @@ public interface PluginConstant {
     String META_HEADER = "app-meta";
 
     /**
+     * 插件信息描述
+     */
+    String INFO = ".info";
+
+    /**
+     * 插件管理者名称
+     */
+    String MANAGER_NAME = "manager";
+
+    /**
+     * 插件管理者路径
+     */
+    String MANAGER_PATH = "/pm";
+
+    /**
+     * 插件管理者标签
+     */
+    String MANAGER_TAG = "plugin-manager";
+
+    /**
+     * 插件管理者主类
+     */
+    String MANAGER_MAIN_CLASS = "org.springplugin.manager.ManagerApplication";
+
+    /**
      * classes目录名
      */
     String CLASSES = "classes";

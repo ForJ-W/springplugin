@@ -33,6 +33,7 @@ import org.springplugin.core.app.context.AppContextCleaner;
 import org.springplugin.core.app.context.SpringAppContextFactory;
 import org.springplugin.core.classloader.AppClassLoaderFactory;
 import org.springplugin.core.classloader.SpringAppClassLoader;
+import org.springplugin.core.contant.PluginConstant;
 import org.springplugin.core.exception.SpringPluginException;
 import org.springplugin.core.server.SpringPluginProperties;
 import org.springplugin.core.util.ClassUtils;
@@ -87,11 +88,12 @@ public class SpringPluginDispatcherServlet extends DispatcherServlet {
         final SpringPluginProperties.Intercept intercept = properties.getIntercept();
         final String identityKey = intercept.getIdentityKey();
         final String uri = request.getRequestURI();
-        String plugin = switch (intercept.getIdentityMode()) {
+        final String plugin = uri.startsWith(PluginConstant.MANAGER_PATH) ? "manager" : switch (intercept.getIdentityMode()) {
             case HEADER -> request.getHeader(identityKey);
             case PARAMETER -> request.getParameter(identityKey);
             default -> "/".equals(uri) ? null : uri.split("/")[1];
         };
+
         if (AppClassLoaderFactory.has(plugin)) {
             Thread.currentThread().setContextClassLoader(SpringAppClassLoader.getInstance(plugin));
             // 获取指定插件的应用上下文中的处理器方法

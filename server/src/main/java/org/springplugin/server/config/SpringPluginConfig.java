@@ -44,14 +44,14 @@ public class SpringPluginConfig {
      * @author afěi
      */
     @Bean
-    @ConditionalOnExpression("'${spring.plugin.intercept.identity-mode}'.toString().equalsIgnoreCase('header')")
+    @ConditionalOnExpression("'${springplugin.intercept.identity-mode}'.toString().equalsIgnoreCase('header')")
     public OpenApiCustomizer openApiCustomizer() {
 
         return openApi -> openApi.getPaths()
                 .values()
                 .stream()
                 .flatMap(pathItem -> pathItem.readOperations().stream())
-                .filter(operation -> !operation.getTags().contains("pm"))
+                .filter(operation -> !operation.getTags().contains(PluginConstant.MANAGER_TAG))
                 .forEach(operation -> operation
                         .addParametersItem(new HeaderParameter()
                                 .name(PluginConstant.META_HEADER)

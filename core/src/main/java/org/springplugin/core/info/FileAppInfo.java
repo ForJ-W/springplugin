@@ -3,6 +3,7 @@ package org.springplugin.core.info;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.springplugin.core.classloader.SpringAppClassLoader;
+import org.springplugin.core.contant.PluginConstant;
 import org.springplugin.core.exception.PluginException;
 import org.springplugin.core.util.AssertUtils;
 import org.springplugin.core.util.PluginExceptionUtils;
@@ -44,12 +45,12 @@ public class FileAppInfo implements AppInfo {
     public static FileAppInfo create(String name, String mainClassName) {
         final FileAppInfo fif = new FileAppInfo(name, mainClassName);
         final File pluginPath = new File(SpringAppClassLoader.LOAD_PATH, name);
-        final File infoFile = new File(pluginPath, ".info");
+        final File infoFile = new File(pluginPath, PluginConstant.INFO);
         if (!infoFile.exists()) {
             try {
                 FileUtils.writeStringToFile(infoFile, GSON.toJson(fif), StandardCharsets.UTF_8);
             } catch (IOException e) {
-                throw new PluginException("Write file fail: '.info'", e);
+                throw new PluginException(String.format("Write file fail: '%s'", PluginConstant.INFO), e);
             }
         } else {
             return new FileAppInfo(name, fif.mainClassName());
@@ -77,7 +78,7 @@ public class FileAppInfo implements AppInfo {
         final File pluginPath = new File(SpringAppClassLoader.LOAD_PATH, name);
         final PluginException pe = PluginExceptionUtils.canNotFindPlugin(name);
         try {
-            final File infoFile = new File(pluginPath, ".info");
+            final File infoFile = new File(pluginPath, PluginConstant.INFO);
             final String fileContent = FileUtils.readFileToString(infoFile, StandardCharsets.UTF_8);
             final FileAppInfo fpi = Optional.ofNullable(GSON.fromJson(fileContent, this.getClass())).orElseThrow(() -> pe);
             return fpi.mainClassName;
