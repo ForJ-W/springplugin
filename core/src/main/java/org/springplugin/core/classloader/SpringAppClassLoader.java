@@ -1,0 +1,228 @@
+/*
+ * Copyright 2023-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package org.springplugin.core.classloader;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.core.SmartClassLoader;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springplugin.core.autoconfigure.ImportCandidates;
+import org.springplugin.core.exception.SpringPluginException;
+import org.springplugin.core.util.ClassUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.security.ProtectionDomain;
+import java.util.*;
+import java.util.jar.JarFile;
+
+/**
+ * spring插件应用类加载器
+ *
+ * @author afěi
+ * @version 1.0.0
+ * @see AppClassLoaderFactory
+ */
+public class SpringAppClassLoader extends AppClassLoader implements SmartClassLoader {
+
+    /**
+     * 默认的class文件路径
+     */
+    public static final String LOAD_PATH = System.getProperty("user.dir") + File.separator + "plugin" + File.separator;
+    /**
+     * 插件候选
+     */
+    final static String[] PLUGIN_CANDIDATES;
+    /**
+     * 插件资源地址
+     */
+    final static String PLUGIN_RESOURCE_LOCATION = "META-INF/spring.plugin";
+
+    static {
+        final Enumeration<URL> urls = ImportCandidates.findUrlsInClasspath(ClassUtils.currentClassLoader(), PLUGIN_RESOURCE_LOCATION);
+        Set<String> importCandidates = new HashSet<>();
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            final List<String> candidates = ImportCandidates.readCandidateConfigurations(url);
+            importCandidates.addAll(candidates);
+        }
+        PLUGIN_CANDIDATES = importCandidates.toArray(String[]::new);
+    }
+
+    /**
+     * 私有构造
+     * <p>
+     * 只允许通过工厂获取{@link #getInstance(String, URL...)}
+     *
+     * @param name 插件名称
+     * @param urls 插件class url
+     * @author afěi
+     */
+    private SpringAppClassLoader(String name, URL[] urls) {
+        super(name, urls);
+    }
+
+    /**
+     * 静态工厂方法获取对象
+     *
+     * @return {@link AppClassLoader}
+     * @author afěi
+     */
+    @NonNull
+    public static AppClassLoader getInstance(String name) {
+        final AppClassLoader classLoader = AppClassLoaderFactory.get(name);
+        if (classLoader != null) {
+            return classLoader;
+        }
+        final URL[] urls;
+        try {
+            final URL parent = new URL("file:" + LOAD_PATH + name + File.separator);
+            final File[] files = findFiles(parent);
+            if (files == null) {
+                return getInstance(name, parent);
+            }
+            urls = new URL[1 + files.length];
+            for (int i = 0; i < files.length; i++) {
+                File f = files[i];
+                if (f.isFile() && f.getName().endsWith(".jar")) {
+                    urls[i] = new URL("jar:file:" + f.getPath() + "!/");
+                } else {
+                    urls[i] = new URL("file:" + f.getPath() + "/");
+                }
+            }
+            urls[urls.length - 1] = parent;
+        } catch (IOException e) {
+            throw new SpringPluginException(String.format("Instantiation url failure, %s", name), e);
+        }
+        return getInstance(name, urls);
+    }
+
+    /**
+     * 寻找class/jar文件列表
+     *
+     * @param parent 插件根url
+     * @return class/jar文件列表
+     * @author afěi
+     */
+    private static File[] findFiles(URL parent) {
+        final File parentFile = new File(parent.getFile());
+        final File[] files = parentFile.listFiles();
+        final File bootInf = new File(parentFile, "BOOT-INF");
+        if (Objects.nonNull(files) && bootInf.exists()) {
+            final File classes = new File(bootInf, "classes");
+            final File lib = new File(bootInf, "lib");
+            return ArrayUtils.addAll(files, ArrayUtils.addAll(lib.listFiles(), classes, lib));
+        }
+        final File lib = new File(parentFile, "lib");
+        if (Objects.nonNull(files) && lib.exists()) {
+            return ArrayUtils.addAll(files, ArrayUtils.addAll(lib.listFiles(), lib));
+        }
+        return files;
+    }
+
+    /**
+     * 静态工厂方法获取对象
+     *
+     * @param name 类加载器名称
+     * @param urls 类文件url
+     * @return {@link AppClassLoader}
+     * @author afěi
+     */
+    @NonNull
+    public static AppClassLoader getInstance(String name, URL... urls) {
+        return AppClassLoaderFactory.get(SpringAppClassLoader.class, name, urls);
+    }
+
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        Class<?> loadedClass = findLoadedClass(name);
+        if (loadedClass != null) {
+            return loadedClass;
+        }
+        for (String pluginCandidate : PLUGIN_CANDIDATES) {
+            if (name.startsWith(pluginCandidate)) {
+                Class<?> clazz = loadPluginClass(name);
+                if (clazz != null) {
+                    return clazz;
+                }
+            }
+        }
+        return super.loadClass(name);
+    }
+
+    /**
+     * 加载插件类
+     *
+     * @param name 类名
+     * @return 类对象
+     * @author afěi
+     */
+    @Nullable
+    protected Class<?> loadPluginClass(String name) {
+        for (URLConnection uc : ucs) {
+            try {
+                if (uc instanceof JarURLConnection jar) {
+                    JarFile jarFile = jar.getJarFile();
+                    String entryName = jar.getEntryName();
+                    if (entryName == null) {
+                        entryName = name.replace('.', '/').concat(".class");
+                    }
+                    if (jarFile.getEntry(entryName) == null) {
+                        continue;
+                    }
+                    byte[] classBytes;
+                    try (InputStream is = jarFile.getInputStream(jarFile.getEntry(entryName))) {
+                        classBytes = is.readAllBytes();
+                    }
+                    return defineClass(name, classBytes, 0, classBytes.length);
+                } else {
+                    byte[] classBytes;
+                    try (InputStream is = new FileInputStream(uc.getURL().getFile() + name.replace('.', '/').concat(".class"))) {
+                        classBytes = is.readAllBytes();
+                        IOUtils.close(is);
+                    }
+                    return defineClass(name, classBytes, 0, classBytes.length);
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isClassReloadable(@NonNull Class<?> clazz) {
+        return true;
+    }
+
+    @NonNull
+    @Override
+    public Class<?> publicDefineClass(@NonNull String name, @NonNull byte[] b, @Nullable ProtectionDomain protectionDomain) {
+        return defineClass(name, b, 0, b.length, protectionDomain);
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+    }
+}
