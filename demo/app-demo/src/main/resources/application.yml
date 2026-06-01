@@ -7,12 +7,12 @@ server:
     ip: ${server.common-ip}
     port: 3306
     username: root
-    password: root
+    password: ${MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     ip: ${server.common-ip}
     port: 6379
-    password: root
+    password: ${REDIS_PASSWORD:}
 
 
 spring:

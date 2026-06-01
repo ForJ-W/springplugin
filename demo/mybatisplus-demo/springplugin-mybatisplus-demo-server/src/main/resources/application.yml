@@ -7,7 +7,7 @@ server:
     ip: ${server.common-ip}
     port: 3306
     username: root
-    password: root
+    password: ${MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 spring:
