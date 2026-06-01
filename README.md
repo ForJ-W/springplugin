@@ -27,9 +27,9 @@ MVC、Flyway、MyBatis Plus 等示例插件。
 
 ## 环境要求
 
-- JDK 17+
+- JDK 25+
 - Maven 3.9+
-- Spring Boot 3.3.x
+- Spring Boot 3.5.x
 
 ## 快速开始
 

@@ -14,8 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         java:
-          - "17"
-          - "21"
+          - "25"
 
     steps:
       - name: Checkout

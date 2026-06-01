@@ -20,7 +20,7 @@ The project is especially useful for developers building extensible Java platfor
 
 - License: Apache License 2.0.
 - Primary branch: `main`.
-- Runtime: Java 17, Maven, Spring Boot 3.3.x.
+- Runtime: Java 25, Maven, Spring Boot 3.5.x.
 - Main modules: `core`, `starter`, `server`, `manager`, `demo`.
 - Public maintenance files: README, CONTRIBUTING, SECURITY, ROADMAP, issue templates, PR template, CI workflow.
 
