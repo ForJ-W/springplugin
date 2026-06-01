@@ -1,51 +1,58 @@
 # Spring Plugin
 
-Spring Plugin 是一个面向 Spring Boot 3 的动态插件应用框架。它通过独立的
-`ApplicationContext`、插件级 `ClassLoader` 和 Web MVC 转发能力，让主应用在
-运行时加载、卸载和隔离插件应用。
+English | [简体中文](README.zh-CN.md)
 
-项目当前包含核心运行时、自动装配 starter、插件管理模块、可运行 server，以及
-MVC、Flyway、MyBatis Plus 等示例插件。
+Spring Plugin is a dynamic plugin application framework for Spring Boot 3. It
+lets a host application load, unload, route to, and isolate plugin applications
+at runtime by using independent `ApplicationContext` instances, plugin-level
+`ClassLoader` isolation, and Spring Web MVC request dispatching.
 
-## 特性
+The repository includes the core runtime, a Spring Boot starter, a plugin
+manager module, a runnable host server, and demo plugins for MVC, Flyway,
+MyBatis Plus, app-level integration, and runner scenarios.
 
-- 动态加载插件 jar，并为每个插件创建独立的 Spring 应用上下文。
-- 使用 `app-meta` 请求头把 HTTP 请求路由到目标插件。
-- 支持插件类加载隔离、bean 注册、Spring MVC 映射和 OpenAPI 集成。
-- 提供 `/pm/load` 和 `/pm/unload` 插件管理接口。
-- 提供多个 demo，覆盖基础 MVC、数据库迁移和 MyBatis Plus 场景。
+## Features
 
-## 模块
+- Dynamically load plugin jars and create an isolated Spring application context
+  for each plugin.
+- Route HTTP requests to target plugins through the `app-meta` request header.
+- Support plugin class loading isolation, bean registration, Spring MVC mapping,
+  and OpenAPI integration.
+- Provide `/pm/load` and `/pm/unload` plugin management endpoints.
+- Include runnable demos that cover MVC, database migration, MyBatis Plus, and
+  application plugin scenarios.
 
-| 模块 | 说明 |
+## Modules
+
+| Module | Description |
 | --- | --- |
-| `core` | 插件上下文、类加载、扫描、自动装配过滤、MVC 分发等核心能力。 |
-| `starter` | 面向宿主应用的 Spring Boot 自动装配入口。 |
-| `server` | 可直接运行的插件宿主服务。 |
-| `manager` | 插件管理应用，提供加载和卸载接口。 |
-| `demo` | 示例插件集合，用于本地验证和使用参考。 |
+| `core` | Core plugin context, class loading, scanning, auto-configuration filtering, and MVC dispatching. |
+| `starter` | Spring Boot auto-configuration entry point for host applications. |
+| `server` | Runnable plugin host service. |
+| `manager` | Plugin management application that exposes load and unload endpoints. |
+| `demo` | Demo plugin collection for local validation and implementation reference. |
 
-## 环境要求
+## Requirements
 
 - JDK 25+
 - Maven 3.9+
 - Spring Boot 3.5.x
 
-## 快速开始
+## Quick Start
 
-构建项目：
+Build the project:
 
 ```bash
 mvn -B clean package
 ```
 
-启动宿主服务：
+Start the host server:
 
 ```bash
 java -Dfile.encoding=UTF-8 -jar server/target/server.jar
 ```
 
-加载 MyBatis Plus 示例插件：
+Load the MyBatis Plus demo plugin:
 
 ```bash
 curl -X POST \
@@ -53,7 +60,7 @@ curl -X POST \
   http://localhost:8000/pm/load
 ```
 
-调用插件接口：
+Call plugin endpoints through the host server:
 
 ```bash
 curl -X POST \
@@ -67,28 +74,28 @@ curl -X GET \
   http://localhost:8000/mybatisplusdemo/list
 ```
 
-卸载插件：
+Unload the plugin:
 
 ```bash
 curl -X POST "http://localhost:8000/pm/unload?name=mybatisplusdemo"
 ```
 
-## 开发调试
+## Development
 
-1. 启动 `server` 模块。
-2. 打包 `demo` 中的插件 jar。
-3. 访问宿主服务的 Swagger/OpenAPI 页面或使用 curl 调用 `/pm/load`。
-4. 通过 `app-meta` 请求头调用插件接口。
+1. Start the `server` module.
+2. Package a plugin jar from the `demo` modules.
+3. Use Swagger/OpenAPI or curl to call `/pm/load` on the host server.
+4. Call plugin endpoints with the `app-meta` request header.
 
-更多结构说明见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the project architecture.
 
-## 开源维护
+## Open Source Maintenance
 
-- 贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)
-- 路线图：[ROADMAP.md](ROADMAP.md)
-- 安全问题：[SECURITY.md](SECURITY.md)
-- Codex for OSS 申请材料草稿：[docs/CODEX_FOR_OSS_APPLICATION.md](docs/CODEX_FOR_OSS_APPLICATION.md)
+- Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Roadmap: [ROADMAP.md](ROADMAP.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+- Codex for OSS application notes: [docs/CODEX_FOR_OSS_APPLICATION.md](docs/CODEX_FOR_OSS_APPLICATION.md)
 
-## 许可证
+## License
 
-Apache License 2.0。详见 [LICENSE](LICENSE)。
+Spring Plugin is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
