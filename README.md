@@ -86,6 +86,7 @@ curl -X POST "http://localhost:8000/pm/unload?name=mybatisplusdemo"
 
 - 贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)
 - 路线图：[ROADMAP.md](ROADMAP.md)
+- 变更日志：[CHANGELOG.md](CHANGELOG.md)
 - 安全问题：[SECURITY.md](SECURITY.md)
 - Codex for OSS 申请材料草稿：[docs/CODEX_FOR_OSS_APPLICATION.md](docs/CODEX_FOR_OSS_APPLICATION.md)
 
