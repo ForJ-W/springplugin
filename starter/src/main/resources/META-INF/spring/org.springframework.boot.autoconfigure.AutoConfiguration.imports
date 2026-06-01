@@ -1,0 +1,3 @@
+org.springplugin.autoconfigure.SpringPluginAutoConfiguration
+org.springplugin.autoconfigure.SpringPluginDispatcherServletAutoConfiguration
+org.springplugin.autoconfigure.SpringPluginSpringdocAutoConfiguration

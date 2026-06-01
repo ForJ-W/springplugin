@@ -1,0 +1,32 @@
+server:
+  port: 8000
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+logging:
+  config: classpath:logback.xml
+#  level:
+#    org.springframework.web: trace
+#    org.springframework.beans: trace
+#    web: trace
+#    org.springplugin.core: trace
+springdoc:
+  cache:
+    disabled: true
+
+springplugin:
+  debug:
+    resource-cache: false
+  name: spring-plugin
+  intercept:
+    white-list:
+      - /pm/**
+      - /v3/api-docs/**
+      - /swagger-ui.html
+      - /swagger-ui/**
+      - /webjars/**
+      - /favicon.ico
+      - /error
+    identity-mode: header

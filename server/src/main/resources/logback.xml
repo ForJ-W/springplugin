@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <springProperty scope="context" name="application.name" source="spring.application.name"/>
+    <!-- 日志存放路径 -->
+    <property name="log.path" value="logs/${application.name}"/>
+    <!-- 日志输出格式 -->
+    <property name="log.pattern"
+              value="%boldMagenta(%d{HH:mm:ss.SSS}) %green([%thread]) %highlight(%-5level) %cyan(%logger{20}) - %cyan([%method,%line]) - %msg%n"/>
+
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 系统日志输出 -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/info.log</file>
+        <!-- 循环政策：基于空间,时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/%d{yyyy-MM-dd}/info.%i.log</fileNamePattern>
+            <!-- 日志最大的历史 7天 -->
+            <maxHistory>7</maxHistory>
+            <!-- 日志总保存量 -->
+            <totalSizeCap>2GB</totalSizeCap>
+            <!-- 文件达到最大64M时会被压缩和切割 -->
+            <maxFileSize>64MB</maxFileSize>
+            <!-- 启动时清理 -->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>INFO</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/error.log</file>
+        <!-- 循环政策：基于空间,时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/%d{yyyy-MM-dd}/error.%i.log</fileNamePattern>
+            <!-- 日志最大的历史 7天 -->
+            <maxHistory>7</maxHistory>
+            <!-- 日志总保存量 -->
+            <totalSizeCap>2GB</totalSizeCap>
+            <!-- 文件达到最大64M时会被压缩和切割 -->
+            <maxFileSize>64MB</maxFileSize>
+            <!-- 启动时清理 -->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>ERROR</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--系统操作日志-->
+    <root level="info">
+        <appender-ref ref="console"/>
+        <!--        <appender-ref ref="file_info"/>-->
+        <!--        <appender-ref ref="file_error"/>-->
+    </root>
+</configuration>
